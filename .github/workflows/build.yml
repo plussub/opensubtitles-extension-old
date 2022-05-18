@@ -10,8 +10,8 @@ on:
 
 
 env:
-  CHROME_APP_ID: lpobdmdfgjokempajoobgfdnhjbjlnpm
-  FIREFOX_WEB_EXT_ID: "{83078104-a00b-45e2-8749-7a10af244653}"
+  CHROME_APP_ID: gbagdbjhcmodnokmjfhkhagnhgmmpgan
+  FIREFOX_WEB_EXT_ID: "{fa13934b-65d0-4632-b49e-5e4f6cba9168}"
 
 jobs:
   build:
@@ -34,40 +34,40 @@ jobs:
           name: dist-${{ matrix.target }}
           path: dist-${{ matrix.target }}/
 
-#  deploy-chrome:
-#    if: startsWith(github.ref, 'refs/tags/')
-#    needs:
-#      - build
-#
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/download-artifact@v2
-#        with:
-#          name: dist-chrome
-#      - run: zip -r plussub.zip .
-#      - id: access_token
-#        run: |
-#          ACCESS_TOKEN=$(curl -s "https://accounts.google.com/o/oauth2/token" -d "client_id=$CHROME_CLIENT_ID&client_secret=$CHROME_CLIENT_SECRET&refresh_token=$CHROME_REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
-#          # the following lines are only required for multi line json
-#          ACCESS_TOKEN="${ACCESS_TOKEN//'%'/'%25'}"
-#          ACCESS_TOKEN="${ACCESS_TOKEN//$'\n'/'%0A'}"
-#          ACCESS_TOKEN="${ACCESS_TOKEN//$'\r'/'%0D'}"
-#          echo "::set-output name=ACCESS_TOKEN::$ACCESS_TOKEN"
-#        env:
-#          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-#          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-#          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-#      - run: >
-#          curl -s
-#          -H "Authorization: Bearer $ACCESS_TOKEN"
-#          -H "x-goog-api-version: 2"
-#          -X PUT
-#          -T plussub.zip
-#          -v https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID
-#        env:
-#          APP_ID: ${{ env.CHROME_APP_ID }}
-#          ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
+  deploy-chrome:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist-chrome
+      - run: zip -r plussub.zip .
+      - id: access_token
+        run: |
+          ACCESS_TOKEN=$(curl -s "https://accounts.google.com/o/oauth2/token" -d "client_id=$CHROME_CLIENT_ID&client_secret=$CHROME_CLIENT_SECRET&refresh_token=$CHROME_REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
+          # the following lines are only required for multi line json
+          ACCESS_TOKEN="${ACCESS_TOKEN//'%'/'%25'}"
+          ACCESS_TOKEN="${ACCESS_TOKEN//$'\n'/'%0A'}"
+          ACCESS_TOKEN="${ACCESS_TOKEN//$'\r'/'%0D'}"
+          echo "::set-output name=ACCESS_TOKEN::$ACCESS_TOKEN"
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+      - run: >
+          curl -s
+          -H "Authorization: Bearer $ACCESS_TOKEN"
+          -H "x-goog-api-version: 2"
+          -X PUT
+          -T plussub.zip
+          -v https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID
+        env:
+          APP_ID: ${{ env.CHROME_APP_ID }}
+          ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
 #      - run: >
 #          curl -s
 #          -H "Authorization: Bearer $ACCESS_TOKEN"
@@ -78,7 +78,7 @@ jobs:
 #        env:
 #          APP_ID: ${{ env.CHROME_APP_ID }}
 #          ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
-#
+
 #
 #  deploy-firefox:
 #    if: startsWith(github.ref, 'refs/tags/')
