@@ -1,4 +1,4 @@
-name: build and deploy(chrome)
+name: build and deploy
 
 on:
   push:
