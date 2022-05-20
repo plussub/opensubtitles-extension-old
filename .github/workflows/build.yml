@@ -68,32 +68,32 @@ jobs:
         env:
           APP_ID: ${{ env.CHROME_APP_ID }}
           ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
-#      - run: >
-#          curl -s
-#          -H "Authorization: Bearer $ACCESS_TOKEN"
-#          -H "x-goog-api-version: 2"
-#          -H "Content-Length: 0"
-#          -X POST
-#          -v https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID/publish
-#        env:
-#          APP_ID: ${{ env.CHROME_APP_ID }}
-#          ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
+      - run: >
+          curl -s
+          -H "Authorization: Bearer $ACCESS_TOKEN"
+          -H "x-goog-api-version: 2"
+          -H "Content-Length: 0"
+          -X POST
+          -v https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID/publish
+        env:
+          APP_ID: ${{ env.CHROME_APP_ID }}
+          ACCESS_TOKEN: ${{ fromJson(steps.access_token.outputs.ACCESS_TOKEN).access_token }}
 
-#
-#  deploy-firefox:
-#    if: startsWith(github.ref, 'refs/tags/')
-#    needs:
-#      - build
-#
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - uses: actions/download-artifact@v2
-#        with:
-#          name: dist-firefox
-#      - run: npx web-ext sign --source-dir ./ || true
-#        env:
-#          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_JWT_ISSUER }}
-#          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
-#          WEB_EXT_ID: ${{ env.FIREFOX_WEB_EXT_ID }}
+
+  deploy-firefox:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: dist-firefox
+      - run: npx web-ext sign --source-dir ./ || true
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.FIREFOX_JWT_ISSUER }}
+          WEB_EXT_API_SECRET: ${{ secrets.FIREFOX_JWT_SECRET }}
+          WEB_EXT_ID: ${{ env.FIREFOX_WEB_EXT_ID }}
 

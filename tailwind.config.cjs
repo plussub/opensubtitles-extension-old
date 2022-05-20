@@ -55,7 +55,7 @@ module.exports = {
     },
     colors: {
       white: colors.white,
-      primary: colors.cyan,
+      primary: colors.warmGray,
       'on-primary': {
         500: '#ffffff',
         600: '#ffffff',
