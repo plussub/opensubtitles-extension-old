@@ -1,5 +1,5 @@
 {
-  "name": "OpenSubtitles Extension",
+  "name": "OpenSubtitles",
   "version": "0.0.0",
   "manifest_version": 3,
   "description": "Load subtitle to a HTML5 video.",
