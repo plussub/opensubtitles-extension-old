@@ -8,7 +8,7 @@
 
 > is a browser extension which adds subtitle to HTML `<video>` tags via file or subtitle search powered by [open subtitles](https://opensubtitles.org) & [tmbd](https://www.themoviedb.org/)
 
-### [Chrome Web Store](https://chrome.google.com/webstore/detail/opensubtitles/gbagdbjhcmodnokmjfhkhagnhgmmpgan)
+### [Chrome Web Store](https://chrome.google.com/webstore/detail/gbagdbjhcmodnokmjfhkhagnhgmmpgan)
 
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/gbagdbjhcmodnokmjfhkhagnhgmmpgan?color=%233c3c3c)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/gbagdbjhcmodnokmjfhkhagnhgmmpgan?color=%233c3c3c)
