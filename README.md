@@ -4,8 +4,7 @@
 
 
 # Open Subtitles
-![build(chrome)](https://github.com/plussub/opensubtitles-extension/workflows/build%20and%20deploy(chrome)/badge.svg)
-![build(firefox)](https://github.com/plussub/opensubtitles-extension/workflows/build%20and%20deploy(firefox)/badge.svg)
+[![build and deploy](https://github.com/plussub/opensubtitles-extension/actions/workflows/build.yml/badge.svg)](https://github.com/plussub/opensubtitles-extension/actions/workflows/build.yml)
 
 > is a browser extension which adds subtitle to HTML `<video>` tags via file or subtitle search powered by [open subtitles](https://opensubtitles.org) & [tmbd](https://www.themoviedb.org/)
 
@@ -14,9 +13,9 @@
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/stars/gbagdbjhcmodnokmjfhkhagnhgmmpgan?color=%233c3c3c)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/gbagdbjhcmodnokmjfhkhagnhgmmpgan?color=%233c3c3c)
 
-### [Firefox Add-On](https://addons.mozilla.org/en-US/firefox/addon/plussub/)
-![Mozilla Add-on](https://img.shields.io/amo/stars/plussub?color=%233c3c3c)
-![Mozilla Add-on](https://img.shields.io/amo/users/plussub?color=%233c3c3c)
+### [Firefox Add-On](https://addons.mozilla.org/en-US/firefox/addon/opensubtitles/)
+![Mozilla Add-on](https://img.shields.io/amo/stars/opensubtitles?color=%233c3c3c)
+![Mozilla Add-on](https://img.shields.io/amo/users/opensubtitles?color=%233c3c3c)
 
 
 ### Feature list
@@ -39,7 +38,7 @@ npm run start:chrome
 1) Type in Chrome address bar: `chrome://extensions/`
 2) Activate developer mode
 3) Load unpacked extension...
-4) Select `plussub-root-folder/dist-chrome`
+4) Select `root-folder/dist-chrome`
 
 ### Install local build in Firefox
 ```
@@ -54,7 +53,7 @@ npm run start:firefox
 1) Type in Firefox address bar: `about:debugging`
 2) Click "This Firefox"
 3) Load Temporary Add-on...
-4) Select `plussub-root-folder/dist-firefox`
+4) Select `root-folder/dist-firefox`
 
 
 ### Test pages
