@@ -1,8 +1,8 @@
 {
-  "name": "OpenSubtitles",
+  "name": "Open Subtitles",
   "version": "0.0.0",
   "manifest_version": 2,
-  "description": "Load subtitle to a HTML5 video.",
+  "description": "Add subtitles to any HTML5 video sites such as Youtube, Netflix, Amazon Prime Video, Disney+, Tencent Video, iQIYI, HBO Max and other stream sites.",
   "author": "Stefan Breitenstein",
   "icons": {
     "16": "res/icons/logo16.png",
