@@ -1,30 +1,19 @@
-Load subtitle into any video.
+Open Subtitles extension provides subtitles experience to any HTML5 video site (youtube, netflix, amazon prime, hulu and other streaming sites)
 
-Add a subtitle, with a few clicks, to the current video.
+Features:
+• Search - autodetection of title, download and view subtitles in videos from OpenSubtitles.com
+• Drag and drop subtitles file if you want custom subtitles
+• Supported subtitle formats: *.srt, *.vtt, *.ass, *.ssa
+• Works on iframes (embedded videos)
+• Synchronize subtitles to video
+• Customize Subtitles color, background color, transparency, font size
+• See transcription/text of video/subtitles, possible copy with shift+left-click
+• Jump to timestamp with left click
 
-By using +Sub, you can search and select your desired subtitle which will be displayed on the video.
-
-This plugin supports Amazon Video, Netflix, Youtube and many more.
-
-You can either way to use the built-in search (powered by tmdb and opensubtitles), to search your desired movie in the desired language
-or you can simply use your local subtitle files.
-
-+Sub has the capability to synchronize the subtitle with the given video.
-You can simply adjust the offset time in the +Sub dialog, which will directly applied to the subtitle.
-
-+Sub has can show the transcript from the given subtitle, which is even copyable with shift+left-click.
-You can also jump to the given time point in the video with a click into the transcript.
-
-Following formats are supported:
- - *.srt
- - *.vtt
- - *.ass
- - *.ssa
-
-+Sub supports the iframes, like embedded youtube videos in a blog.
-
-Github:
-www.github.com/plussub/plussub
-
-If you have questions don't bother to join me in Discord:
-https://discord.gg/sEEeu5r9Nb
+How to use:
+- Install the extension to your browser.
+- We recommend to pin it to navigation bar, so you can use it easily
+- Open website with video
+- Click on "Open Subtitles" extension at the right top corner in your browser, it will open extension dialog
+- The first video is autodetected, title is detected, search for subtitles and download them, or drop subtitle file
+- Subtitles are displayed on video
