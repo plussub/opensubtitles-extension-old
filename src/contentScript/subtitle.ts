@@ -51,7 +51,7 @@ export const init = ({ inputObservable, getVideoElementFrom }: Payload): Observa
       return {
         track,
         entries: messageEvent.data.subtitle.entries.map((vtt) => {
-          const cue = new VTTCue(vtt.from / 1000, vtt.to / 1000, `<c.uitjeuin>${vtt.text}</c.uitjeuin>`);
+          const cue = new VTTCue(vtt.from / 1000, vtt.to / 1000, `<c.${EXTENSION_ORIGIN}>${vtt.text}</c.${EXTENSION_ORIGIN}>`);
           cue.size = 100;
           Object.assign(cue, window.cue);
           return cue;
