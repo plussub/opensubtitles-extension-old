@@ -2,8 +2,6 @@ name: build and deploy
 
 on:
   push:
-#    branches:
-#      - master
     tags:
       - "v*"
   workflow_dispatch:
@@ -28,6 +26,7 @@ jobs:
           node-version: '16.x'
       - run: npm ci
       - run: npm run gen
+      - run: npm test
       - run: npm run build:${{ matrix.target }}
       - uses: actions/upload-artifact@v2
         with:
@@ -35,7 +34,7 @@ jobs:
           path: dist-${{ matrix.target }}/
 
   deploy-chrome:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs:
       - build
 
@@ -45,7 +44,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: dist-chrome
-      - run: zip -r plussub.zip .
+      - run: zip -r extension.zip .
       - id: access_token
         run: |
           ACCESS_TOKEN=$(curl -s "https://accounts.google.com/o/oauth2/token" -d "client_id=$CHROME_CLIENT_ID&client_secret=$CHROME_CLIENT_SECRET&refresh_token=$CHROME_REFRESH_TOKEN&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob")
@@ -63,7 +62,7 @@ jobs:
           -H "Authorization: Bearer $ACCESS_TOKEN"
           -H "x-goog-api-version: 2"
           -X PUT
-          -T plussub.zip
+          -T extension.zip
           -v https://www.googleapis.com/upload/chromewebstore/v1.1/items/$APP_ID
         env:
           APP_ID: ${{ env.CHROME_APP_ID }}
@@ -81,7 +80,7 @@ jobs:
 
 
   deploy-firefox:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
     needs:
       - build
 
