@@ -5,8 +5,8 @@
 #npm & bower
 node_modules/
 
-#build artefacts
-plussub.zip
+#build artifacts
+*.zip
 
 .DS_Store
 
