@@ -15,19 +15,19 @@
       <div style="grid-area: detail; grid-template-columns: auto 1fr; grid-column-gap: 0.5rem" class="grid w-full text-xs leading-relaxed">
         <div style="grid-column: 1 / 3">Rating</div>
         <div style="grid-column: 1 / 2" class="px-2">
-          <a :href="tmdbLink" target="_blank" class="inline-flex gap-1 w-full text-primary-500 hover:text-primary-700 hover:underline">
-            <span class="flex-grow">TMDb</span>
-            <FontAwesomeIcon icon="external-link-alt" class="self-center h-icon-sm pb-1" />
-          </a>
-        </div>
-        <div style="grid-column: 2 / 3" class="font-thin">{{ searchState.tmdb.vote_average }} / 10</div>
-        <div style="grid-column: 1 / 2" class="px-2">
           <a :href="searchState.openSubtitle.websiteLink" target="_blank" class="inline-flex gap-1 w-full text-primary-500 hover:text-primary-700 hover:underline">
             <span class="flex-grow">Subtitle</span>
             <FontAwesomeIcon icon="external-link-alt" class="self-center h-icon-sm pb-1" />
           </a>
         </div>
         <div style="grid-column: 2 / 3" class="font-thin">{{ searchState.openSubtitle.rating }} / 10</div>
+        <div style="grid-column: 1 / 2" class="px-2">
+          <a :href="tmdbLink" target="_blank" class="inline-flex gap-1 w-full text-primary-500 hover:text-primary-700 hover:underline">
+            <span class="flex-grow">TMDb</span>
+            <FontAwesomeIcon icon="external-link-alt" class="self-center h-icon-sm pb-1" />
+          </a>
+        </div>
+        <div style="grid-column: 2 / 3" class="font-thin">{{ searchState.tmdb.vote_average }} / 10</div>
       </div>
     </div>
     <div class="relative" style="grid-area: header">
