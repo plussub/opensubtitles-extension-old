@@ -1,6 +1,6 @@
 {
   "name": "@plussub/open-subtitles-extension",
-  "version": "6.1.15",
+  "version": "6.2.0",
   "description": "Browser extension which adds subtitle to html5 videos",
   "author": "Stefan Breitenstein",
   "type": "module",
