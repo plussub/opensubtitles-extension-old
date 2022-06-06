@@ -1,6 +1,6 @@
 <template>
   <svg
-    fill="white"
+    fill="currentColor"
     version="1.1"
     id="Layer_1"
     x="0px"

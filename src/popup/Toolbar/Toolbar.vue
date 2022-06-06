@@ -4,7 +4,7 @@
       <FontAwesomeIcon icon="chevron-left" class="h-full py-2 pl-1 hover:text-on-primary-hover-500" />
     </a>
     <div v-else>
-      <logo style="grid-area: logo" class="h-full w-full" />
+      <logo style="grid-area: logo" class="h-full w-full hover:text-on-primary-hover-500 hover:cursor-pointer" @click="redirectHomePage" />
     </div>
 
     <div style="grid-area: buttons" class="flex justify-end font-header font-medium text-xl mr-3">
@@ -54,6 +54,7 @@ export default defineComponent({
 
     return {
       toHome: navigationStore.actions.toHome,
+      redirectHomePage: () =>  window.open("https://opensubtitles.com", '_blank'),
       logo,
       close,
       draggableAreaRef
