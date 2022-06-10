@@ -112,6 +112,14 @@ jobs:
           payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.currentTime.outputs.utc }}", "iat": ${{ steps.currentTime.outputs.utc }}, "exp": ${{ steps.currentTime.outputs.utc }} }'
 
       - run: >
+          curl 
+          https://addons.mozilla.org/api/v5/addons/addon/${{ env.FIREFOX_WEB_EXT_ID }}/versions/
+          -L 
+          -o response.json
+          -v
+      - run: cat response.json
+
+      - run: >
           curl
           -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
           -X POST https://addons.mozilla.org/api/v5/addons/addon/${{ env.FIREFOX_WEB_EXT_ID }}/versions/
