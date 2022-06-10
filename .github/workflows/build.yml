@@ -101,7 +101,7 @@ jobs:
           -o extension_src.zip
           -v
 
-      - run: echo "::set-output name=utc::$(date -d \"5 minutes\" +%s)
+      - run: echo "::set-output name=utc::$(date -d '5 minutes' +%s)
 
         id: currentTime
 
