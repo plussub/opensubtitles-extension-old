@@ -118,12 +118,14 @@ jobs:
           -L 
           -o response.json
           -v
-      - run: cat response.json
+
+      - run: echo "::set-output name=latest::$(cat response.json | jq .results[0].id)"
+        id: version
 
       - run: >
           curl
           -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
           -X POST https://addons.mozilla.org/api/v5/addons/addon/${{ env.FIREFOX_WEB_EXT_ID }}/versions/
           -F "source=@extension_src.zip"
-          -F "upload=${{ env.FIREFOX_WEB_EXT_ID }}"
+          -F "upload=${{ steps.version.outputs.latest }}"
           -v
