@@ -101,12 +101,17 @@ jobs:
           -o extension_src.zip
           -v
 
+      - name: JWT Generator
+        id: firefoxJWT
+        uses: morzzz007/github-actions-jwt-generator@1.0.1
+        with:
+          secret: ${{ secrets.FIREFOX_JWT_SECRET }}
+          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}"}'
+
       - run: >
           curl
-          -H "Authorization: JWT ${{ secrets.FIREFOX_JWT_SECRET }}"
+          -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
           -X POST https://addons.mozilla.org/api/v5/addons/addon/${{ env.FIREFOX_WEB_EXT_ID }}/versions/
           -F "source=@extension_src.zip"
           -F "upload=${{ env.FIREFOX_WEB_EXT_ID }}"
           -v
-          
-
