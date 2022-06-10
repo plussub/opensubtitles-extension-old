@@ -96,7 +96,7 @@ jobs:
 
       - run: > 
           curl 
-          https://github.com/${{ github.action_repository }}/zipball/${GITHUB_REF#refs/heads/}/ 
+          https://github.com/${{ github.repository }}/zipball/${GITHUB_REF#refs/heads/}/ 
           -L 
           -o extension_src.zip
           -v
