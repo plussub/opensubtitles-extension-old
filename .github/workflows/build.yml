@@ -101,7 +101,8 @@ jobs:
           -o extension_src.zip
           -v
 
-      - run: echo "::set-output name=utc::$($(date +%s)+300)"
+      - run: echo "::set-output name=utc::$(date -d \"5 minutes\" +%s)
+
         id: currentTime
 
       - name: JWT Generator
