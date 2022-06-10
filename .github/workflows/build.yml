@@ -101,16 +101,17 @@ jobs:
           -o extension_src.zip
           -v
 
-      - run: echo "::set-output name=utc::$(date -d '5 minutes' +%s)"
-
-        id: currentTime
+      - run: | 
+          echo "::set-output name=current::$(date +%s)"
+          echo "::set-output name=later::$(date -d '5 minutes' +%s)"
+        id: time
 
       - name: JWT Generator
         id: firefoxJWT
         uses: morzzz007/github-actions-jwt-generator@1.0.1
         with:
           secret: ${{ secrets.FIREFOX_JWT_SECRET }}
-          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.currentTime.outputs.utc }}", "iat": ${{ steps.currentTime.outputs.utc }}, "exp": ${{ steps.currentTime.outputs.utc }} }'
+          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.time.outputs.current }}", "iat": ${{ steps.time.outputs.current }}, "exp": ${{ steps.time.outputs.later }} }'
 
       - run: >
           curl 
