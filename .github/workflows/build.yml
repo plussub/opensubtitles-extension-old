@@ -125,7 +125,7 @@ jobs:
       - run: >
           curl
           -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
-          -X PATCH https://addons.mozilla.org/api/v5/addons/addon/%7B${{ env.FIREFOX_WEB_EXT_ID }}%7D/versions/${{ steps.version.outputs.latest }}
+          -X PATCH https://addons.mozilla.org/api/v5/addons/addon/%7B${{ env.FIREFOX_WEB_EXT_ID }}%7D/versions/${{ steps.version.outputs.latest }}/
           -F "source=@extension_src.zip"
           -L
           -v
