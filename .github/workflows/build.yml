@@ -109,7 +109,7 @@ jobs:
         uses: morzzz007/github-actions-jwt-generator@1.0.1
         with:
           secret: ${{ secrets.FIREFOX_JWT_SECRET }}
-          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.currentTime.outputs.utc }}", "iat": "${{ steps.currentTime.outputs.utc }}", "exp": "${{ steps.currentTime.outputs.utc }}" }'
+          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.currentTime.outputs.utc }}", "iat": ${{ steps.currentTime.outputs.utc }}, "exp": ${{ steps.currentTime.outputs.utc }} }'
 
       - run: >
           curl
