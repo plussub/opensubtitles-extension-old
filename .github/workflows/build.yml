@@ -107,7 +107,7 @@ jobs:
         id: time
 
       - name: JWT Generator
-        id: firefoxJWT
+        id: firefoxJWT0
         uses: morzzz007/github-actions-jwt-generator@1.0.1
         with:
           secret: ${{ secrets.FIREFOX_JWT_SECRET }}
@@ -115,7 +115,7 @@ jobs:
 
       - run: >
           curl 
-          -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
+          -H "Authorization: JWT ${{ steps.firefoxJWT0.outputs.token }}"
           https://addons.mozilla.org/api/v5/addons/addon/%7B${{ env.FIREFOX_WEB_EXT_ID }}%7D/versions?filter=all_with_unlisted
           -L 
           -o response.json
@@ -124,10 +124,17 @@ jobs:
       - run: echo "::set-output name=latest::$(cat response.json | jq .results[0].id)"
         id: version
 
-      - run: sleep 180s
+      - name: JWT Generator
+        id: firefoxJWT1
+        uses: morzzz007/github-actions-jwt-generator@1.0.1
+        with:
+          secret: ${{ secrets.FIREFOX_JWT_SECRET }}
+          payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.time.outputs.current }}", "iat": ${{ steps.time.outputs.current }}, "exp": ${{ steps.time.outputs.later }} }'
+
+      #      - run: sleep 180s
       - run: >
           curl
-          -H "Authorization: JWT ${{ steps.firefoxJWT.outputs.token }}"
+          -H "Authorization: JWT ${{ steps.firefoxJWT1.outputs.token }}"
           -X PATCH https://addons.mozilla.org/api/v5/addons/addon/%7B${{ env.FIREFOX_WEB_EXT_ID }}%7D/versions/${{ steps.version.outputs.latest }}/
           -F "source=@extension_src.zip"
           -L
