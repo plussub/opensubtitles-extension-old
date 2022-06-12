@@ -131,7 +131,6 @@ jobs:
           secret: ${{ secrets.FIREFOX_JWT_SECRET }}
           payload: '{"iss":"${{ secrets.FIREFOX_JWT_ISSUER }}", "jti": "${{ steps.time.outputs.current }}", "iat": ${{ steps.time.outputs.current }}, "exp": ${{ steps.time.outputs.later }} }'
 
-      #      - run: sleep 180s
       - run: >
           curl
           -H "Authorization: JWT ${{ steps.firefoxJWT1.outputs.token }}"
