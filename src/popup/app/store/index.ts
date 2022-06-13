@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { windowStorage } from '@/windowStorage';
-import { EXTENSION_ORIGIN } from '@/types';
 
 export const useStore = defineStore('app', {
   state: () => {
@@ -9,13 +8,9 @@ export const useStore = defineStore('app', {
       src: 'NONE' as 'NONE' | 'FILE' | 'SEARCH'
     }
   },
-  actions: {
-    close(){
-      document.getElementById(`${EXTENSION_ORIGIN}Shadow`)?.remove();
-    }
-  },
   persist: {
     key: 'app',
     storage: windowStorage
   },
 })
+

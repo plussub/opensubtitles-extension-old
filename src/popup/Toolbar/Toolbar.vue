@@ -26,8 +26,8 @@ import Logo from './Logo.vue';
 
 import logo from '@/res/logo128.png';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
-import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useCloseStore } from '@/close/store';
 
 export default defineComponent({
   components: {
@@ -48,7 +48,7 @@ export default defineComponent({
   },
   setup() {
     const navigationStore = useNavigationStore();
-    const appStore = useAppStore();
+    const closeStore = useCloseStore();
     const draggableAreaRef = ref(null);
     useDraggableArea({ draggableAreaRef });
 
@@ -56,7 +56,7 @@ export default defineComponent({
       toHome: () => navigationStore.to("HOME", {contentTransitionName: "content-navigate-shallow"}),
       redirectHomePage: () =>  window.open("https://opensubtitles.com", '_blank'),
       logo,
-      close: () => appStore.close(),
+      close: () => closeStore.close(),
       draggableAreaRef
     };
   }

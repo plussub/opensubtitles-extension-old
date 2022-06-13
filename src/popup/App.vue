@@ -8,6 +8,7 @@
 <script lang="ts">
 import { computed, defineComponent, onUnmounted, PropType, provide, watch } from 'vue';
 import { useStore as useAppStore } from '@/app/store';
+import { useStore as useCloseStore } from '@/close/store';
 import { init as initContentScriptStore } from '@/contentScript/store';
 import { init as initVideoStore } from '@/video/store';
 import { useStore as useFileStore } from '@/file/store';
@@ -43,7 +44,11 @@ export default defineComponent({
     }
   },
   setup(props) {
+    const closeStore = useCloseStore();
+    closeStore.$patch({unmountFn: props.unmount});
     const appStore = useAppStore();
+
+
     const navigationStore = useNavigationStore();
     const subtitleStore = useSubtitleStore();
     const contentScriptStore = initContentScriptStore();
@@ -58,11 +63,6 @@ export default defineComponent({
     const unmountSubject = new Subject<undefined>();
     contentScriptStore.actions.requestAllContentScriptsToRegister();
 
-    appStore.$onAction(({name}) => {
-      if(name === "close") {
-        props.unmount();
-      }
-    });
 
 
     watch(
