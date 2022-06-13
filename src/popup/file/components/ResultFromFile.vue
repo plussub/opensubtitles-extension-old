@@ -29,6 +29,7 @@ import SuffixIconButton from '@/components/SuffixIconButton.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
+import { useStore as useFileStore } from '@/file/store';
 
 export default defineComponent({
   components: {
@@ -37,7 +38,7 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore();
-    const fileStore = useInjectStore('fileStore');
+    const fileStore = useFileStore();
     const subtitleStore = useSubtitleStore();
     const videoStore = useInjectStore('videoStore');
 
@@ -50,7 +51,7 @@ export default defineComponent({
       remove: async () => {
         await videoStore.actions.removeCurrent();
         appStore.reset();
-        fileStore.actions.reset();
+        fileStore.reset();
         subtitleStore.reset();
       },
       highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),

@@ -10,7 +10,7 @@ import { computed, defineComponent, onUnmounted, PropType, provide, watch } from
 import { useStore as useAppStore } from '@/app/store';
 import { init as initContentScriptStore } from '@/contentScript/store';
 import { init as initVideoStore } from '@/video/store';
-import { init as initFileStore } from '@/file/store';
+import { useStore as useFileStore } from '@/file/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { init as initSearchStore } from '@/search/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
@@ -51,8 +51,7 @@ export default defineComponent({
     provide('appearanceStore', appearanceStore);
     const videoStore = initVideoStore({ use: { contentScriptStore, appearanceStore} });
     provide('videoStore', videoStore);
-    const fileStore = initFileStore();
-    provide('fileStore', fileStore);
+    const fileStore = useFileStore();
     const searchStore = initSearchStore();
     provide('searchStore', searchStore);
 
@@ -73,7 +72,7 @@ export default defineComponent({
           appStore.reset();
           subtitleStore.reset();
           searchStore.actions.reset();
-          fileStore.actions.reset();
+          fileStore.reset();
         }
       }
     );

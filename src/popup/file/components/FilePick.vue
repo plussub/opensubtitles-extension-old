@@ -42,6 +42,7 @@ import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
+import { useStore as useFileStore } from '@/file/store';
 
 export default defineComponent({
   components: { FontAwesomeIcon },
@@ -54,7 +55,7 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore();
-    const fileStore = useInjectStore('fileStore');
+    const fileStore = useFileStore();
     const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
@@ -78,13 +79,13 @@ export default defineComponent({
     };
 
     const onLoad = ({ fileName, result }: OnLoadPayload): void => {
-      fileStore.actions.setFilename({ filename: fileName });
+      fileStore.$patch({ filename: fileName });
       appStore.$patch({ state: 'SELECTED', src: 'FILE' });
       const format = getFormatFromFilename(fileName);
       if (!format) {
         showFileErrorMsg('Unknown file format');
         appStore.reset();
-        fileStore.actions.reset();
+        fileStore.reset();
         subtitleStore.reset();
         videoStore.actions.removeCurrent();
         return;
@@ -97,7 +98,7 @@ export default defineComponent({
       } catch (e) {
         showFileErrorMsg('Parse error, not a valid subtitle file');
         appStore.reset();
-        fileStore.actions.reset();
+        fileStore.reset();
         subtitleStore.reset();
         videoStore.actions.removeCurrent();
         return;
