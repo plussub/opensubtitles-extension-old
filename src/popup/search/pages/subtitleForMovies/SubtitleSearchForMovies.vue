@@ -57,6 +57,7 @@ import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { useUnmountObservable } from '@/composables';
 import { useInjectStore } from '@/composables/useInjectStore';
 import { useStore as useAppStore } from '@/app/store';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: {
@@ -92,7 +93,7 @@ export default defineComponent({
     const appStore = useAppStore();
     const searchStore = useInjectStore('searchStore');
     const subtitleStore = useInjectStore('subtitleStore');
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
     const trackStore = useInjectStore('trackStore');
 
     const unmountObservable = useUnmountObservable();
@@ -176,10 +177,10 @@ export default defineComponent({
           })
           .catch(() => appStore.$patch({ state: 'ERROR' }));
 
-        navigationStore.actions.toHome({ contentTransitionName: 'content-navigate-select-to-home' });
+        navigationStore.to("HOME", { contentTransitionName: 'content-navigate-select-to-home' });
       },
       backFn: (): void =>
-        navigationStore.actions.toMovieTvSearch({
+        navigationStore.to("MOVIE-TV-SEARCH", {
           contentTransitionName: 'content-navigate-shallow',
           query: props.searchQuery
         })

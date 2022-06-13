@@ -54,6 +54,7 @@ import { useUnmountObservable } from '@/composables';
 import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: {
@@ -80,7 +81,7 @@ export default defineComponent({
   },
   setup(props) {
     const searchStore = useInjectStore('searchStore');
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
 
     const unmountObservable = useUnmountObservable();
@@ -127,7 +128,7 @@ export default defineComponent({
 
       videoCount: videoStore.getters.count,
       videoName: videoStore.getters.videoName,
-      toSettings: navigationStore.actions.toSettings,
+      toSettings: () => navigationStore.to("SETTINGS", {contentTransitionName: "content-navigate-deeper"}),
       changeQueryToSuggested: () => (internalQuery.value = videoStore.getters.videoName.value),
       select: (tmdb: VideoSearchResultEntry): void => {
         searchStore.actions.setTmdbInSelection({
@@ -138,17 +139,21 @@ export default defineComponent({
           title: tmdb.title,
           vote_average: tmdb.vote_average ?? 0
         });
-        const to = tmdb.media_type === 'movie' ? navigationStore.actions.toSubtitleSearchForMovies : navigationStore.actions.toSubtitleSearchForSeries;
-        to({
+        const navigationPayload = {
           tmdb_id: tmdb.tmdb_id,
           media_type: tmdb.media_type,
           searchQuery: internalQuery.value,
-          contentTransitionName: 'content-navigate-deeper'
-        });
+          contentTransitionName: 'content-navigate-deeper' as const
+        };
+        if(tmdb.media_type === 'movie'){
+          navigationStore.to("SUBTITLE-SEARCH-FOR-MOVIES", navigationPayload);
+        } else {
+          navigationStore.to("SUBTITLE-SEARCH-FOR-SERIES", navigationPayload)
+        }
       },
       backFn: async (): Promise<void> => {
         await videoStore.actions.removeCurrent();
-        navigationStore.actions.toHome();
+        navigationStore.to("HOME", { contentTransitionName: "content-navigate-shallow" });
       }
     };
   }

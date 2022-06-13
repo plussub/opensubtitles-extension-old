@@ -14,15 +14,15 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: { TranscriptContent },
   setup() {
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
     return {
-      toTranscript: navigationStore.actions.toTranscript,
+      toTranscript: () => navigationStore.to("TRANSCRIPT", {contentTransitionName: "content-navigate-deeper" }),
       follow: ref(true)
     };
   }

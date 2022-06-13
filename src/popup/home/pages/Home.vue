@@ -52,6 +52,7 @@ import Mention from "@/home/components/Mention.vue";
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: {
@@ -75,12 +76,12 @@ export default defineComponent({
   },
   setup() {
     const appStore = useAppStore();
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
 
     return {
       appState: appStore.state,
-      toSettings: () => navigationStore.actions.toSettings(),
-      toSearch: () => navigationStore.actions.toMovieTvSearch(),
+      toSettings: () => navigationStore.to("SETTINGS", {contentTransitionName: "content-navigate-deeper"}),
+      toSearch: () => navigationStore.to("MOVIE-TV-SEARCH", {contentTransitionName: "content-navigate-deeper"}),
       current: computed(() => {
         if (appStore.state !== 'NONE' && appStore.src === 'SEARCH') {
           return 'search-card';

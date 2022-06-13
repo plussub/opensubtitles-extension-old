@@ -39,6 +39,7 @@ import { getFormatFromFilename } from '@/subtitle/util';
 import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: { FontAwesomeIcon },
@@ -53,7 +54,7 @@ export default defineComponent({
     const appStore = useAppStore();
     const fileStore = useInjectStore('fileStore');
     const subtitleStore = useInjectStore('subtitleStore');
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
     const trackStore = useInjectStore('trackStore');
 
@@ -101,11 +102,7 @@ export default defineComponent({
       }
 
       // workaround for contentscript communication
-      setTimeout(() => {
-        navigationStore.actions.toHome({
-          contentTransitionName: 'content-navigate-select-to-home'
-        });
-      },100);
+      setTimeout(() => navigationStore.to('HOME', { contentTransitionName: 'content-navigate-select-to-home' }),100);
 
     };
     const onError = (): void => showFileErrorMsg('Some error happened when parsing the subtitle');

@@ -1,6 +1,6 @@
 <template>
   <div class="h-auto overflow-hidden grid app--container">
-    <component :is="navigationState.component" v-if='initialized' v-bind="navigationState.params" />
+    <component :is="navigationStore.component" v-if='initialized' v-bind="navigationStore.params" />
     <Loading v-else/>
   </div>
 </template>
@@ -13,7 +13,7 @@ import { init as initVideoStore } from '@/video/store';
 import { init as initFileStore } from '@/file/store';
 import { init as initSubtitleStore } from '@/subtitle/store';
 import { init as initSearchStore } from '@/search/store';
-import { init as initNavigationStore } from '@/navigation/store';
+import { useStore as useNavigationStore } from '@/navigation/store';
 import { init as initTrackStore } from '@/track/store';
 import { init as initAppearanceStore } from '@/appearance/store';
 
@@ -45,8 +45,7 @@ export default defineComponent({
   },
   setup(props) {
     const appStore = useAppStore();
-    const navigationStore = initNavigationStore();
-    provide('navigationStore', navigationStore);
+    const navigationStore = useNavigationStore();
     const subtitleStore = initSubtitleStore({ use: { appStore } });
     provide('subtitleStore', subtitleStore);
     const contentScriptStore = initContentScriptStore();
@@ -107,19 +106,19 @@ export default defineComponent({
           return;
         }
         // navigate if only 1 video exists
-        if (videoCount === 1 && videoList[0] && navigationStore.state.value.name === 'HOME' && appState.state === 'NONE') {
-          videoStore.actions.setCurrent({ video: videoList[0] }).then(() => navigationStore.actions.toMovieTvSearch())
+        if (videoCount === 1 && videoList[0] && navigationStore.name === 'HOME' && appState.state === 'NONE') {
+          videoStore.actions.setCurrent({ video: videoList[0] }).then(() => navigationStore.to("MOVIE-TV-SEARCH", {contentTransitionName: 'content-navigate-deeper'}))
           return;
         }
 
         // navigate to selection if additional videos appear
-        if (videoCount > 1 && prevVideoCount === 1 && navigationStore.state.value.name === 'MOVIE-TV-SEARCH' && appState.state === 'NONE') {
-          videoStore.actions.removeCurrent().then(() => navigationStore.actions.toHome());
+        if (videoCount > 1 && prevVideoCount === 1 && navigationStore.name === 'MOVIE-TV-SEARCH' && appState.state === 'NONE') {
+          videoStore.actions.removeCurrent().then(() => navigationStore.to("HOME", {contentTransitionName: "content-navigate-shallow" }));
           return;
         }
 
-        if (videoCount === 0 && navigationStore.state.value.name !== 'HOME') {
-          navigationStore.actions.toHome();
+        if (videoCount === 0 && navigationStore.name !== 'HOME') {
+          navigationStore.to("HOME", {contentTransitionName: "content-navigate-shallow" });
           return;
         }
       },
@@ -128,7 +127,7 @@ export default defineComponent({
 
     return {
       initialized,
-      navigationState: navigationStore.state
+      navigationStore
     };
   }
 });

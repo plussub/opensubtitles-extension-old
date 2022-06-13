@@ -27,6 +27,7 @@ import { clear as storageClear } from 'storage';
 import PageLayout from '@/components/PageLayout.vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
+import { useStore as useNavigationStore } from '@/navigation/store';
 
 export default defineComponent({
   components: {
@@ -42,7 +43,7 @@ export default defineComponent({
   },
   setup() {
     const searchStore = useInjectStore('searchStore');
-    const navigationStore = useInjectStore('navigationStore');
+    const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
 
     return {
@@ -51,7 +52,9 @@ export default defineComponent({
         await storageClear();
         searchStore.actions.setPreferredLanguage({ preferredLanguage: 'en' });
       },
-      backFn: () => (videoStore.getters.count.value === 1 ? navigationStore.actions.toMovieTvSearch() : navigationStore.actions.toHome())
+      backFn: () => (videoStore.getters.count.value === 1 ?
+        navigationStore.to("MOVIE-TV-SEARCH", {contentTransitionName: 'content-navigate-shallow'}) :
+        navigationStore.to("HOME", {contentTransitionName: 'content-navigate-shallow'}))
     };
   }
 });

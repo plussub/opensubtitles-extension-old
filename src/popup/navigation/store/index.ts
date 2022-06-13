@@ -1,16 +1,10 @@
-import {computed, ComputedRef, ref} from 'vue';
 import MovieTvSearch from "@/search/pages/movieTv/MovieTvSearch.vue";
 import SubtitleSearchForMovies from "@/search/pages/subtitleForMovies/SubtitleSearchForMovies.vue";
 import SubtitleSearchForSeries from "@/search/pages/subtitleForSeries/SubtitleSearchForSeries.vue";
 import Transcript from "@/subtitle/pages/Transcript.vue";
 import Settings from "@/settings/pages/Settings.vue";
 import Home from "@/home/pages/Home.vue";
-
-export type NavigationState = {
-  name: 'HOME' | 'SETTINGS' | 'MOVIE-TV-SEARCH' | 'SUBTITLE-SEARCH-FOR-MOVIES' | 'SUBTITLE-SEARCH-FOR-SERIES' | 'TRANSCRIPT';
-  params: unknown;
-  component: unknown;
-};
+import { defineStore } from 'pinia';
 
 export interface ToHomePayload {
   contentTransitionName: 'content-navigate-shallow' | 'content-navigate-select-to-home';
@@ -39,63 +33,45 @@ export interface ToTranscriptPayload {
   contentTransitionName: 'content-navigate-deeper';
 }
 
-export interface NavigationStore {
-  state: ComputedRef<NavigationState>;
-  actions: {
-    toHome: (params?: ToHomePayload) => void;
-    toSettings: (params?: ToSettingsPayload) => void;
-    toMovieTvSearch: (params?: ToMovieTvSearchPayload) => void;
-    toSubtitleSearchForMovies: (params: ToSubtitleSearchForMoviesPayload) => void;
-    toSubtitleSearchForSeries: (params: ToSubtitleSearchForSeriesPayload) => void;
-    toTranscript: (params?: ToTranscriptPayload) => void;
-  };
+type ViewNames = 'HOME' | 'SETTINGS' | 'MOVIE-TV-SEARCH' | 'SUBTITLE-SEARCH-FOR-MOVIES' | 'SUBTITLE-SEARCH-FOR-SERIES' | 'TRANSCRIPT';
+
+
+function to(name: 'HOME', params: ToHomePayload): void
+function to(name: 'SETTINGS', params: ToSettingsPayload): void
+function to(name: 'MOVIE-TV-SEARCH', params: ToMovieTvSearchPayload): void
+function to(name: 'SUBTITLE-SEARCH-FOR-MOVIES', params: ToSubtitleSearchForMoviesPayload): void
+function to(name: 'SUBTITLE-SEARCH-FOR-SERIES', params: ToSubtitleSearchForSeriesPayload): void
+function to(name: 'TRANSCRIPT', params: ToTranscriptPayload): void
+function to(name: ViewNames, params: ToHomePayload | ToSettingsPayload | ToMovieTvSearchPayload): void {
+  this.name = name;
+  this.params = params;
 }
 
-export const init = (): NavigationStore => {
-
-  const component = computed(() => {
-    if (state.value.name === 'MOVIE-TV-SEARCH') {
-      return MovieTvSearch;
-    } else if (state.value.name === 'SUBTITLE-SEARCH-FOR-MOVIES') {
-      return SubtitleSearchForMovies;
-    } else if (state.value.name === 'SUBTITLE-SEARCH-FOR-SERIES') {
-      return SubtitleSearchForSeries;
-    } else if (state.value.name === 'TRANSCRIPT') {
-      return Transcript;
-    } else if (state.value.name === 'SETTINGS') {
-      return Settings;
-    } else {
-      return Home;
+export const useStore = defineStore('navigation', {
+  state: () => {
+    return {
+      name: 'HOME' as ViewNames,
+      params: {} as Record<string, string>
     }
-  });
-
-  const state = ref<NavigationState>({
-    name: 'HOME',
-    params: {},
-    component
-  });
-
-  return {
-    state: computed(() => state.value),
-    actions: {
-      toHome: (params: ToHomePayload = {contentTransitionName: 'content-navigate-shallow'}): void => {
-        state.value = {name: 'HOME', params, component};
-      },
-      toSettings: (params: ToSettingsPayload =  { contentTransitionName: 'content-navigate-deeper'}): void => {
-        state.value = {name: 'SETTINGS', params, component};
-      },
-      toMovieTvSearch: (params: ToMovieTvSearchPayload = {contentTransitionName: 'content-navigate-deeper'}): void => {
-        state.value = {name: 'MOVIE-TV-SEARCH', params, component};
-      },
-      toSubtitleSearchForMovies: (params: ToSubtitleSearchForMoviesPayload): void => {
-        state.value = {name: 'SUBTITLE-SEARCH-FOR-MOVIES', params, component};
-      },
-      toSubtitleSearchForSeries: (params: ToSubtitleSearchForSeriesPayload): void => {
-        state.value = {name: 'SUBTITLE-SEARCH-FOR-SERIES', params, component};
-      },
-      toTranscript: (params: ToTranscriptPayload = {contentTransitionName: 'content-navigate-deeper'}): void => {
-        state.value = {name: 'TRANSCRIPT', params, component};
+  },
+  actions: {
+    to
+  },
+  getters: {
+    component: (state) => {
+      if (state.name === 'MOVIE-TV-SEARCH') {
+        return MovieTvSearch;
+      } else if (state.name === 'SUBTITLE-SEARCH-FOR-MOVIES') {
+        return SubtitleSearchForMovies;
+      } else if (state.name === 'SUBTITLE-SEARCH-FOR-SERIES') {
+        return SubtitleSearchForSeries;
+      } else if (state.name === 'TRANSCRIPT') {
+        return Transcript;
+      } else if (state.name === 'SETTINGS') {
+        return Settings;
+      } else {
+        return Home;
       }
     }
-  };
-};
+  }
+});
