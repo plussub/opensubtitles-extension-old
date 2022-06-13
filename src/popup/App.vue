@@ -11,7 +11,7 @@ import { useStore as useAppStore } from '@/app/store';
 import { init as initContentScriptStore } from '@/contentScript/store';
 import { init as initVideoStore } from '@/video/store';
 import { init as initFileStore } from '@/file/store';
-import { init as initSubtitleStore } from '@/subtitle/store';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { init as initSearchStore } from '@/search/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { init as initTrackStore } from '@/track/store';
@@ -46,8 +46,7 @@ export default defineComponent({
   setup(props) {
     const appStore = useAppStore();
     const navigationStore = useNavigationStore();
-    const subtitleStore = initSubtitleStore({ use: { appStore } });
-    provide('subtitleStore', subtitleStore);
+    const subtitleStore = useSubtitleStore();
     const contentScriptStore = initContentScriptStore();
     const appearanceStore = initAppearanceStore({ use: { contentScriptStore }});
     provide('appearanceStore', appearanceStore);
@@ -75,7 +74,7 @@ export default defineComponent({
       (video) => {
         if (video === null) {
           appStore.reset();
-          subtitleStore.actions.reset();
+          subtitleStore.reset();
           searchStore.actions.reset();
           fileStore.actions.reset();
         }
@@ -83,15 +82,15 @@ export default defineComponent({
     );
 
     watch(
-      () => subtitleStore.state.value.withOffsetParsed,
+      () => subtitleStore.withOffsetParsed,
       (subtitles) => {
-        const subtitleId = subtitleStore.state.value.id;
+        const subtitleId = subtitleStore.id;
         if (!subtitleId) {
           console.warn('subtitleId is null');
           return;
         }
         appearanceStore.actions.applyStyle();
-        videoStore.actions.addVtt({ subtitles, subtitleId, language: subtitleStore.state.value.language ?? 'en' });
+        videoStore.actions.addVtt({ subtitles, subtitleId, language: subtitleStore.language ?? 'en' });
       }
     );
 

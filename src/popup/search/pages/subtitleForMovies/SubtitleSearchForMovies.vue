@@ -58,6 +58,7 @@ import { useUnmountObservable } from '@/composables';
 import { useInjectStore } from '@/composables/useInjectStore';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   components: {
@@ -92,7 +93,7 @@ export default defineComponent({
   setup(props) {
     const appStore = useAppStore();
     const searchStore = useInjectStore('searchStore');
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
     const trackStore = useInjectStore('trackStore');
 
@@ -166,13 +167,13 @@ export default defineComponent({
 
         download(openSubtitle)
           .then(({ raw, format }) => {
-            subtitleStore.actions.setRaw({
+            subtitleStore.setRaw({
               raw,
               format,
               id: openSubtitle.attributes.files[0].file_name ?? "-",
               language: language.value.iso639_2
             });
-            subtitleStore.actions.parse();
+            subtitleStore.parse();
             trackStore.actions.track({ source: 'search-for-movie', language: language.value.iso639_2 });
           })
           .catch(() => appStore.$patch({ state: 'ERROR' }));

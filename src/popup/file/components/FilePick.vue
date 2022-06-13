@@ -40,6 +40,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   components: { FontAwesomeIcon },
@@ -53,7 +54,7 @@ export default defineComponent({
   setup() {
     const appStore = useAppStore();
     const fileStore = useInjectStore('fileStore');
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
     const trackStore = useInjectStore('trackStore');
@@ -83,20 +84,20 @@ export default defineComponent({
         showFileErrorMsg('Unknown file format');
         appStore.reset();
         fileStore.actions.reset();
-        subtitleStore.actions.reset();
+        subtitleStore.reset();
         videoStore.actions.removeCurrent();
         return;
       }
-      subtitleStore.actions.setRaw({ raw: result, format, id: fileName, language: null });
+      subtitleStore.setRaw({ raw: result, format, id: fileName, language: null });
 
       try {
-        subtitleStore.actions.parse();
+        subtitleStore.parse();
         trackStore.actions.track({ source: 'file', language: '' });
       } catch (e) {
         showFileErrorMsg('Parse error, not a valid subtitle file');
         appStore.reset();
         fileStore.actions.reset();
-        subtitleStore.actions.reset();
+        subtitleStore.reset();
         videoStore.actions.removeCurrent();
         return;
       }

@@ -23,7 +23,7 @@ import Timeline from './Timeline.vue';
 import Excerpt from './Excerpt.vue';
 import NumberInputField from '@/components/NumberInputField.vue';
 import RangeInputField from '@/components/RangeInputField.vue';
-import { useInjectStore } from '@/composables/useInjectStore';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   components: {
@@ -33,16 +33,16 @@ export default defineComponent({
     NumberInputField
   },
   setup() {
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
 
     const offsetTime = computed({
-      get: () => subtitleStore.state.value.offsetTime,
+      get: () => subtitleStore.offsetTime,
       set: (val) => {
         if (val === undefined) {
           return;
         }
         const offsetTime = parseInt(val.toString());
-        subtitleStore.actions.setOffsetTime({ offsetTime: Number.isNaN(offsetTime) ? 0 : offsetTime });
+        subtitleStore.setOffsetTime({ offsetTime: Number.isNaN(offsetTime) ? 0 : offsetTime });
       }
     });
     return {

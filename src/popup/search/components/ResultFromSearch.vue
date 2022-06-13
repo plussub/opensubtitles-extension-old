@@ -61,6 +61,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStringFn } from '@/composables';
 import { useStore as useAppStore } from '@/app/store';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   components: {
@@ -72,7 +73,7 @@ export default defineComponent({
   setup() {
     const appStore = useAppStore();
     const searchStore = useInjectStore('searchStore');
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
     const videoStore = useInjectStore('videoStore');
     const {capitalize} = useStringFn();
 
@@ -89,7 +90,7 @@ export default defineComponent({
       remove: () => {
         appStore.reset();
         searchStore.actions.reset();
-        subtitleStore.actions.reset();
+        subtitleStore.reset();
         videoStore.actions.removeCurrent();
       },
       highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),

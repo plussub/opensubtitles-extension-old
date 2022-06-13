@@ -20,7 +20,7 @@ export const useStore = defineStore('app', {
     }
   },
   persist: {
-    key: 'store-key',
+    key: 'app',
     storage: windowStorage
   },
 })

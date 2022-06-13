@@ -19,6 +19,7 @@ import {computed, defineComponent, PropType, ref, watch} from 'vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import { binarySearch } from './binarySearch';
 import { Duration } from "luxon";
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   props: {
@@ -29,7 +30,7 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
     const videoStore = useInjectStore('videoStore');
     const currentTime = computed(() => parseInt(videoStore.getters.current.value?.lastTimestamp ?? '0', 10));
 
@@ -37,7 +38,7 @@ export default defineComponent({
     const transcriptContentContainer = ref<HTMLElement | null>(null);
 
     watch(currentTime, (currentTime) => {
-      const pos = binarySearch(currentTime, subtitleStore.state.value.withOffsetParsed);
+      const pos = binarySearch(currentTime, subtitleStore.withOffsetParsed);
 
       if (pos === -1) return;
 
@@ -56,7 +57,7 @@ export default defineComponent({
       currentPos,
       transcriptContentContainer,
       subtitleTexts: computed(() =>
-        subtitleStore.state.value.withOffsetParsed.map(({ from, text }) => ({
+        subtitleStore.withOffsetParsed.map(({ from, text }) => ({
           formattedFrom: Duration.fromMillis(from).toFormat('mm:ss'),
           text,
           time: from / 1000

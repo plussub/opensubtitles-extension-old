@@ -8,17 +8,18 @@ import { Chart, ChartPoint } from 'chart.js';
 import { Duration } from 'luxon';
 import { findNext } from './findNext';
 import { useInjectStore } from '@/composables/useInjectStore';
+import { useStore as useSubtitleStore } from '@/subtitle/store';
 
 export default defineComponent({
   setup() {
-    const subtitleStore = useInjectStore('subtitleStore');
+    const subtitleStore = useSubtitleStore();
     const videoStore = useInjectStore('videoStore');
 
     const canvas = ref<HTMLCanvasElement | null>(null);
     const chart = ref<null | Chart>(null);
     const currentPos = ref(0);
     const currentTime = computed(() => parseInt(videoStore.getters.current.value?.lastTimestamp ?? '0', 10));
-    const parsedPartial = computed(() => subtitleStore.state.value.withOffsetParsed.filter((e, idx) => idx >= currentPos.value && idx < currentPos.value + 3));
+    const parsedPartial = computed(() => subtitleStore.withOffsetParsed.filter((e, idx) => idx >= currentPos.value && idx < currentPos.value + 3));
 
     watch(
       [parsedPartial, chart],
@@ -63,7 +64,7 @@ export default defineComponent({
       videoTimePoint.x = currentTime;
       videoTimePointLine.x = currentTime;
       chart.value?.update();
-      const pos = findNext(currentTime, subtitleStore.state.value.withOffsetParsed);
+      const pos = findNext(currentTime, subtitleStore.withOffsetParsed);
       if (pos !== -1) {
         currentPos.value = pos;
       }
