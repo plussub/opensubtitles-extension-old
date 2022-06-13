@@ -1,7 +1,7 @@
 import {computed, ComputedRef, ref, Ref} from "vue";
 import {parse as srtVttParse} from "@plussub/srt-vtt-parser";
 import {parse as assSsaParse } from './ass-ssa-parser';
-import { Store } from 'storeTypes';
+import { useStore as useAppStore } from '@/app/store';
 
 export interface SubtitleEntry {
   from: number;
@@ -43,7 +43,7 @@ declare global {
 
 interface InitPayload {
   use: {
-    appStore: Store<'appStore'>
+    appStore: ReturnType<typeof useAppStore>
   }
 }
 
@@ -101,10 +101,10 @@ export const init = ({use}: InitPayload): SubtitleStore => {
         };
       },
       parse: (): void => {
-        use.appStore.actions.setState({ state: 'PARSING' });
+        use.appStore.$patch({ state: 'PARSING' });
         const {raw, format, id} = window.extension_subtitle.value;
         if (!raw || !format || !id) {
-          use.appStore.actions.setState({ state: 'ERROR' });
+          use.appStore.$patch({ state: 'ERROR' });
           throw new Error('raw format or id does not exists');
         }
         try {
@@ -122,9 +122,9 @@ export const init = ({use}: InitPayload): SubtitleStore => {
               to: e.to + window.extension_subtitle.value.offsetTime
             }))
           };
-          use.appStore.actions.setState({ state: 'DONE' });
+          use.appStore.$patch({ state: 'DONE' });
         } catch(e) {
-          use.appStore.actions.setState({ state: 'ERROR' });
+          use.appStore.$patch({ state: 'ERROR' });
           throw new Error('parse error');
         }
       }

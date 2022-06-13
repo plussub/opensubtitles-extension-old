@@ -60,6 +60,7 @@ import SuffixIconButton from '@/components/SuffixIconButton.vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStringFn } from '@/composables';
+import { useStore as useAppStore } from '@/app/store';
 
 export default defineComponent({
   components: {
@@ -69,7 +70,7 @@ export default defineComponent({
   },
   emits: ['remove'],
   setup() {
-    const appStore = useInjectStore('appStore');
+    const appStore = useAppStore();
     const searchStore = useInjectStore('searchStore');
     const subtitleStore = useInjectStore('subtitleStore');
     const videoStore = useInjectStore('videoStore');
@@ -83,10 +84,10 @@ export default defineComponent({
     });
 
     return {
-      appState: appStore.state,
+      appState: appStore,
       searchState: searchStore.state,
       remove: () => {
-        appStore.actions.reset();
+        appStore.reset();
         searchStore.actions.reset();
         subtitleStore.actions.reset();
         videoStore.actions.removeCurrent();

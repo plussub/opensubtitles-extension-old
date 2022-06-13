@@ -6,8 +6,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onUnmounted, provide, watch } from 'vue';
-import { init as initAppStore } from '@/app/store';
+import { computed, defineComponent, onUnmounted, PropType, provide, watch } from 'vue';
+import { useStore as useAppStore } from '@/app/store';
 import { init as initContentScriptStore } from '@/contentScript/store';
 import { init as initVideoStore } from '@/video/store';
 import { init as initFileStore } from '@/file/store';
@@ -37,9 +37,14 @@ export default defineComponent({
     Transcript,
     Settings
   },
-  setup() {
-    const appStore = initAppStore();
-    provide('appStore', appStore);
+  props: {
+    unmount: {
+      type: Function as PropType<() => unknown | undefined>,
+      required: true,
+    }
+  },
+  setup(props) {
+    const appStore = useAppStore();
     const navigationStore = initNavigationStore();
     provide('navigationStore', navigationStore);
     const subtitleStore = initSubtitleStore({ use: { appStore } });
@@ -59,11 +64,18 @@ export default defineComponent({
     const unmountSubject = new Subject<undefined>();
     contentScriptStore.actions.requestAllContentScriptsToRegister();
 
+    appStore.$onAction(({name}) => {
+      if(name === "close") {
+        props.unmount();
+      }
+    });
+
+
     watch(
       () => videoStore.getters.current.value,
       (video) => {
         if (video === null) {
-          appStore.actions.reset();
+          appStore.reset();
           subtitleStore.actions.reset();
           searchStore.actions.reset();
           fileStore.actions.reset();
@@ -89,7 +101,7 @@ export default defineComponent({
     const initialized = computed(() => searchStore.getters.initialized.value && appearanceStore.getters.initialized.value);
 
     watch(
-      [initialized, videoStore.getters.count, appStore.state, videoStore.getters.list, videoStore.getters.current],
+      [initialized, videoStore.getters.count, appStore, videoStore.getters.list, videoStore.getters.current],
       ([initialized, videoCount, appState, videoList], [_prevInitialized, prevVideoCount, _prevAppState, _prevVideoList]) => {
         if(!initialized){
           return;

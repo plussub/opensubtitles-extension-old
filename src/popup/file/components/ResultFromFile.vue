@@ -27,6 +27,7 @@ import { defineComponent, onUnmounted } from 'vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import SuffixIconButton from '@/components/SuffixIconButton.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
+import { useStore as useAppStore } from '@/app/store';
 
 export default defineComponent({
   components: {
@@ -34,7 +35,7 @@ export default defineComponent({
     SuffixIconButton
   },
   setup() {
-    const appStore = useInjectStore('appStore');
+    const appStore = useAppStore();
     const fileStore = useInjectStore('fileStore');
     const subtitleStore = useInjectStore('subtitleStore');
     const videoStore = useInjectStore('videoStore');
@@ -47,7 +48,7 @@ export default defineComponent({
       appState: appStore.state,
       remove: async () => {
         await videoStore.actions.removeCurrent();
-        appStore.actions.reset();
+        appStore.reset();
         fileStore.actions.reset();
         subtitleStore.actions.reset();
       },

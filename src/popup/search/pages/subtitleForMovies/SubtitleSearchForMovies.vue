@@ -56,6 +56,7 @@ import { from, Subject } from 'rxjs';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { useUnmountObservable } from '@/composables';
 import { useInjectStore } from '@/composables/useInjectStore';
+import { useStore as useAppStore } from '@/app/store';
 
 export default defineComponent({
   components: {
@@ -88,7 +89,7 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const appStore = useInjectStore('appStore');
+    const appStore = useAppStore();
     const searchStore = useInjectStore('searchStore');
     const subtitleStore = useInjectStore('subtitleStore');
     const navigationStore = useInjectStore('navigationStore');
@@ -153,8 +154,7 @@ export default defineComponent({
         })
       ),
       select: (openSubtitle: SubtitleSearchResultData) => {
-        appStore.actions.setState({ state: 'SELECTED' });
-        appStore.actions.setSrc({ src: 'SEARCH' });
+        appStore.$patch({ state: 'SELECTED', src: 'SEARCH'  });
         searchStore.actions.setPreferredLanguage({ preferredLanguage: language.value.iso639_2 });
         searchStore.actions.selectOpenSubtitle({
           format: openSubtitle.attributes.format ?? 'srt',
@@ -174,7 +174,7 @@ export default defineComponent({
             subtitleStore.actions.parse();
             trackStore.actions.track({ source: 'search-for-movie', language: language.value.iso639_2 });
           })
-          .catch(() => appStore.actions.setState({ state: 'ERROR' }));
+          .catch(() => appStore.$patch({ state: 'ERROR' }));
 
         navigationStore.actions.toHome({ contentTransitionName: 'content-navigate-select-to-home' });
       },

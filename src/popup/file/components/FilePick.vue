@@ -38,6 +38,7 @@ import { OnLoadPayload, readFile } from './readFile';
 import { getFormatFromFilename } from '@/subtitle/util';
 import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
+import { useStore as useAppStore } from '@/app/store';
 
 export default defineComponent({
   components: { FontAwesomeIcon },
@@ -49,7 +50,7 @@ export default defineComponent({
     }
   },
   setup() {
-    const appStore = useInjectStore('appStore');
+    const appStore = useAppStore();
     const fileStore = useInjectStore('fileStore');
     const subtitleStore = useInjectStore('subtitleStore');
     const navigationStore = useInjectStore('navigationStore');
@@ -75,12 +76,11 @@ export default defineComponent({
 
     const onLoad = ({ fileName, result }: OnLoadPayload): void => {
       fileStore.actions.setFilename({ filename: fileName });
-      appStore.actions.setState({ state: 'SELECTED' });
-      appStore.actions.setSrc({ src: 'FILE' });
+      appStore.$patch({ state: 'SELECTED', src: 'FILE' });
       const format = getFormatFromFilename(fileName);
       if (!format) {
         showFileErrorMsg('Unknown file format');
-        appStore.actions.reset();
+        appStore.reset();
         fileStore.actions.reset();
         subtitleStore.actions.reset();
         videoStore.actions.removeCurrent();
@@ -93,7 +93,7 @@ export default defineComponent({
         trackStore.actions.track({ source: 'file', language: '' });
       } catch (e) {
         showFileErrorMsg('Parse error, not a valid subtitle file');
-        appStore.actions.reset();
+        appStore.reset();
         fileStore.actions.reset();
         subtitleStore.actions.reset();
         videoStore.actions.removeCurrent();

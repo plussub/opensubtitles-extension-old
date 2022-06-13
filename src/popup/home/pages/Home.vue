@@ -51,6 +51,7 @@ import SearchResultInfo from "@/search/components/SearchResultInfo.vue";
 import Mention from "@/home/components/Mention.vue";
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
+import { useStore as useAppStore } from '@/app/store';
 
 export default defineComponent({
   components: {
@@ -73,7 +74,7 @@ export default defineComponent({
     }
   },
   setup() {
-    const appStore = useInjectStore('appStore');
+    const appStore = useAppStore();
     const navigationStore = useInjectStore('navigationStore');
 
     return {
@@ -81,13 +82,13 @@ export default defineComponent({
       toSettings: () => navigationStore.actions.toSettings(),
       toSearch: () => navigationStore.actions.toMovieTvSearch(),
       current: computed(() => {
-        if (appStore.state.value.state !== 'NONE' && appStore.state.value.src === 'SEARCH') {
+        if (appStore.state !== 'NONE' && appStore.src === 'SEARCH') {
           return 'search-card';
         }
-        if (appStore.state.value.state !== 'NONE' && appStore.state.value.src === 'FILE') {
+        if (appStore.state !== 'NONE' && appStore.src === 'FILE') {
           return 'file-card';
         }
-        if (appStore.state.value.state === 'NONE') {
+        if (appStore.state === 'NONE') {
           return 'page-videos';
         }
         return 'unknown';
