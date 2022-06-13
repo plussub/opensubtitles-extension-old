@@ -7,11 +7,6 @@ export const useStore = defineStore('file', {
       filename: ''
     }
   },
-  actions: {
-    reset(){
-      this.filename = "";
-    }
-  },
   persist: {
     key: 'file',
     storage: windowStorage

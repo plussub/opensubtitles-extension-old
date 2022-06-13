@@ -10,12 +10,7 @@ export const useStore = defineStore('app', {
     }
   },
   actions: {
-    reset(){
-      this.src = "NONE";
-      this.state = "NONE";
-    },
     close(){
-
       document.getElementById(`${EXTENSION_ORIGIN}Shadow`)?.remove();
     }
   },

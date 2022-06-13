@@ -69,10 +69,10 @@ export default defineComponent({
       () => videoStore.getters.current.value,
       (video) => {
         if (video === null) {
-          appStore.reset();
-          subtitleStore.reset();
+          appStore.$reset();
+          subtitleStore.$reset();
           searchStore.actions.reset();
-          fileStore.reset();
+          fileStore.$reset();
         }
       }
     );

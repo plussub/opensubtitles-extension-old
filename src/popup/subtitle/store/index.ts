@@ -24,15 +24,6 @@ export const useStore = defineStore('subtitle', {
     };
   },
   actions: {
-    reset() {
-      this.id = null;
-      this.raw = null;
-      this.format = null;
-      this.language = null;
-      this.parsed = [];
-      this.withOffsetParsed = [];
-      this.offsetTime = 0;
-    },
     setRaw({ raw, format, id, language }: {raw: string, format: SubtitleFormat, id: string, language: string|null}) {
       this.reset();
       this.id = id;

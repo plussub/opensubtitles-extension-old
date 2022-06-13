@@ -50,9 +50,9 @@ export default defineComponent({
       appState: appStore.state,
       remove: async () => {
         await videoStore.actions.removeCurrent();
-        appStore.reset();
-        fileStore.reset();
-        subtitleStore.reset();
+        appStore.$reset();
+        fileStore.$reset();
+        subtitleStore.$reset();
       },
       highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),
       removeHighlightFromVideo: videoStore.actions.removeHighlight,

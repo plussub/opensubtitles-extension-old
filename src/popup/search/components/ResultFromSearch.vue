@@ -88,9 +88,9 @@ export default defineComponent({
       appState: appStore,
       searchState: searchStore.state,
       remove: () => {
-        appStore.reset();
+        appStore.$reset();
         searchStore.actions.reset();
-        subtitleStore.reset();
+        subtitleStore.$reset();
         videoStore.actions.removeCurrent();
       },
       highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),

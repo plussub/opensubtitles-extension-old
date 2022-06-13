@@ -84,9 +84,9 @@ export default defineComponent({
       const format = getFormatFromFilename(fileName);
       if (!format) {
         showFileErrorMsg('Unknown file format');
-        appStore.reset();
-        fileStore.reset();
-        subtitleStore.reset();
+        appStore.$reset();
+        fileStore.$reset();
+        subtitleStore.$reset();
         videoStore.actions.removeCurrent();
         return;
       }
@@ -97,9 +97,9 @@ export default defineComponent({
         trackStore.track({ source: 'file', language: '' });
       } catch (e) {
         showFileErrorMsg('Parse error, not a valid subtitle file');
-        appStore.reset();
-        fileStore.reset();
-        subtitleStore.reset();
+        appStore.$reset();
+        fileStore.$reset();
+        subtitleStore.$reset();
         videoStore.actions.removeCurrent();
         return;
       }
