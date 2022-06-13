@@ -29,7 +29,7 @@
 
 <script lang="ts">
 import { defineComponent, onUnmounted, PropType } from 'vue';
-import Duration from 'luxon/src/duration';
+import { Duration } from 'luxon';
 import { Video } from '@/video/store';
 
 import Divider from '@/components/Divider.vue';
@@ -48,7 +48,6 @@ export default defineComponent({
   },
   setup(props) {
     const videoStore = useInjectStore('videoStore');
-
     onUnmounted(() => videoStore.actions.removeHighlight());
 
     return {
