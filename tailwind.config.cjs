@@ -2,8 +2,8 @@ const colors = require('tailwindcss/colors');
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 module.exports = {
-  purge: ['./src/**/*.vue', './src/**/*.html'],
-  darkMode: false, // or 'media' or 'class'
+  content: ['./src/**/*.vue', './src/**/*.html'],
+  media: false, // or 'media' or 'class'
   theme: {
     spacing: {
       '0': '0px',
@@ -55,25 +55,25 @@ module.exports = {
     },
     colors: {
       white: colors.white,
-      primary: colors.warmGray,
+      primary: colors.stone,
       'on-primary': {
         500: '#ffffff',
         600: '#ffffff',
         700: '#ffffff'
       },
       'on-primary-hover': {
-        500: colors.blueGray['700']
+        500: colors.slate['700']
       },
-      surface: colors.coolGray,
+      surface: colors.gray,
       'on-surface': {
-        50: colors.blueGray['700']
+        50: colors.slate['700']
       },
       'sub-text-on-surface': {
-        50: colors.blueGray[400]
+        50: colors.slate[400]
       },
       error: colors.rose['50'],
       'error-icon': colors.red['600'],
-      'on-error': colors.blueGray['700'],
+      'on-error': colors.slate['700'],
 
       'destructive-icon': colors.red['600']
     },
