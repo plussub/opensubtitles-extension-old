@@ -41,6 +41,7 @@ import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
+import { useStore as useTrackStore } from '@/track/store';
 
 export default defineComponent({
   components: { FontAwesomeIcon },
@@ -57,7 +58,7 @@ export default defineComponent({
     const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
     const videoStore = useInjectStore('videoStore');
-    const trackStore = useInjectStore('trackStore');
+    const trackStore = useTrackStore();
 
     const inputRef = ref<{ files: { name: string } | Blob[] } | null>(null);
 
@@ -92,7 +93,7 @@ export default defineComponent({
 
       try {
         subtitleStore.parse();
-        trackStore.actions.track({ source: 'file', language: '' });
+        trackStore.track({ source: 'file', language: '' });
       } catch (e) {
         showFileErrorMsg('Parse error, not a valid subtitle file');
         appStore.reset();

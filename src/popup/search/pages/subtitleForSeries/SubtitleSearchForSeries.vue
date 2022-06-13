@@ -61,6 +61,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
+import { useStore as useTrackStore } from '@/track/store';
 
 export default defineComponent({
   components: {
@@ -98,7 +99,7 @@ export default defineComponent({
     const subtitleStore = useSubtitleStore();
     const searchStore = useInjectStore('searchStore');
     const navigationStore = useNavigationStore();
-    const trackStore = useInjectStore('trackStore');
+    const trackStore = useTrackStore();
 
     const unmountObservable = useUnmountObservable();
 
@@ -208,7 +209,7 @@ export default defineComponent({
               language: language.value.iso639_2
             });
             subtitleStore.parse();
-            trackStore.actions.track({ source: 'search-for-series', language: language.value.iso639_2 });
+            trackStore.track({ source: 'search-for-series', language: language.value.iso639_2 });
           })
           .catch(() => appStore.$patch({ state: 'ERROR' }));
 

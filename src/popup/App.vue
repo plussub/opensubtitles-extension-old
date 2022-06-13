@@ -14,7 +14,6 @@ import { init as initFileStore } from '@/file/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { init as initSearchStore } from '@/search/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
-import { init as initTrackStore } from '@/track/store';
 import { init as initAppearanceStore } from '@/appearance/store';
 
 import Home from '@/home/pages/Home.vue';
@@ -56,8 +55,6 @@ export default defineComponent({
     provide('fileStore', fileStore);
     const searchStore = initSearchStore();
     provide('searchStore', searchStore);
-    const trackStore = initTrackStore();
-    provide('trackStore', trackStore);
 
     const unmountSubject = new Subject<undefined>();
     contentScriptStore.actions.requestAllContentScriptsToRegister();

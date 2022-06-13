@@ -1,7 +1,6 @@
 import { SearchStore } from '@/search/store';
 import { VideoStore } from '@/video/store';
 import { FileStore } from '@/file/store';
-import { TrackStore } from '@/track/store';
 import { AppearanceStore } from '@/appearance/store';
 import { ContentScriptStore } from '@/contentScript/store';
 
@@ -12,8 +11,6 @@ export type Store<T extends StoreKey> = T extends 'searchStore'
   ? VideoStore
   : T extends 'fileStore'
   ? FileStore
-  : T extends 'trackStore'
-  ? TrackStore
   : T extends 'appearanceStore'
   ? AppearanceStore
   : T extends 'contentScriptStore'
