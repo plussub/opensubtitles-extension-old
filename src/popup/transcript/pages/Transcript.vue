@@ -15,7 +15,18 @@
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
           <LoadingBar class="w-full" />
         </div>
-        <TranscriptContent style="grid-area: entries"></TranscriptContent>
+
+        <TranscriptContent
+          :entries="transcriptStore.entries"
+          :position="transcriptStore.currentSubtitlePos"
+          style="grid-area: entries"
+          @copy="transcriptStore.copy"
+          @jump="transcriptStore.jump">
+          <template #line="{entry}">
+            <span class="text-center flex-shrink-0 w-14">{{ format(entry) }}</span>
+            <span class="text-left">{{ entry.text }}</span>
+          </template>
+        </TranscriptContent>
       </div>
     </template>
   </PageLayout>
@@ -25,11 +36,13 @@
 import { defineComponent, PropType } from 'vue';
 import PageLayout from '@/components/PageLayout.vue';
 import LoadingBar from '@/components/LoadingBar.vue';
-import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
+import TranscriptContent from '@/transcript/components/TranscriptContent.vue';
 import Toolbar from '@/toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useVideoStore } from '@/video/store';
-// todo: move stuff to store
+import { useStore as useTranscriptStore } from '@/transcript/store';
+import { SubtitleEntry } from '@/subtitle/store';
+import { Duration } from 'luxon';
 export default defineComponent({
   components: {
     FontAwesomeIcon,
@@ -47,8 +60,12 @@ export default defineComponent({
   },
   setup() {
     const videoStore = useVideoStore();
+    const transcriptStore = useTranscriptStore();
+
     return {
-      videoStore
+      videoStore,
+      transcriptStore,
+      format: (entry: SubtitleEntry) => Duration.fromMillis(entry.from).toFormat('mm:ss')
     };
   }
 });

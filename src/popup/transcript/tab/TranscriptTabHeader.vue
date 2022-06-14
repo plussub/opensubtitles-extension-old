@@ -1,6 +1,7 @@
 <template>
   <PrefixIconButton
-    icon='palette'
+    icon-type='local'
+    icon='caption'
     icon-size='large'
     class='py-3'
     :class="{ 'border-b-2': selected, 'text-primary-700': selected }">

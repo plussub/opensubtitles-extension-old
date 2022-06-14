@@ -13,14 +13,12 @@
         :select="() => selectedArea = 'appearance-settings'">
       </slot>
 
-      <PrefixIconButton
-        icon-type='local'
-        icon='caption'
-        icon-size='large'
-        class='py-3'
-        :class="{ 'border-b-2': selectedArea === 'transcript', 'text-primary-700': selectedArea === 'transcript' }"
-        @click="selectedArea = 'transcript'"
-      />
+      <slot
+        name='transcript-tab-header'
+        :selected="selectedArea === 'transcript'"
+        :select="() => selectedArea = 'transcript'">
+      </slot>
+
       <slot
         name='info-tab-header'
         :selected="selectedArea === 'info'"
@@ -32,7 +30,7 @@
     <div class='mx-9 mt-8'>
       <slot v-if="selectedArea === 'time-settings'" name='time-settings-tab'></slot>
       <slot v-if="selectedArea === 'appearance-settings'" name='appearance-settings-tab'></slot>
-      <TranscriptPanel v-if="selectedArea === 'transcript'" />
+      <slot v-if="selectedArea === 'transcript'" name='transcript-tab'></slot>
       <slot v-if="selectedArea === 'info'" name='info-tab'></slot>
     </div>
   </div>
@@ -40,15 +38,11 @@
 
 <script lang='ts'>
 import { defineComponent, ref } from 'vue';
-import PrefixIconButton from '@/components/PrefixIconButton.vue';
 import Divider from '@/components/Divider.vue';
-import TranscriptPanel from '@/subtitle/components/TranscriptPanel.vue';
 
 export default defineComponent({
   components: {
-    TranscriptPanel,
-    Divider,
-    PrefixIconButton
+    Divider
   },
   setup() {
     return {

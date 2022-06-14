@@ -22,7 +22,7 @@ import Loading from '@/loading/pages/Loading.vue';
 import MovieTvSearch from '@/search/pages/movieTv/MovieTvSearch.vue';
 import SubtitleSearchForMovies from '@/search/pages/subtitleForMovies/SubtitleSearchForMovies.vue';
 import SubtitleSearchForSeries from '@/search/pages/subtitleForSeries/SubtitleSearchForSeries.vue';
-import Transcript from '@/subtitle/pages/Transcript.vue';
+import Transcript from '@/transcript/pages/Transcript.vue';
 import Settings from '@/settings/pages/Settings.vue';
 import '@/styles.css';
 

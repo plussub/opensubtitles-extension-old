@@ -8,23 +8,39 @@
       <span class="mr-1">Follow</span>
       <input v-model="follow" type="checkbox" class="text-primary-700 focus:ring-0 focus:ring-offset-0" />
     </div>
-    <TranscriptContent :follow="follow" class="border rounded max-h-52"></TranscriptContent>
+    <TranscriptContent
+      :entries="transcriptStore.entries"
+      :follow="follow"
+      :position="transcriptStore.currentSubtitlePos"
+      class="border rounded max-h-52"
+      @copy="transcriptStore.copy"
+      @jump="transcriptStore.jump">
+      <template #line="{entry}">
+        <span class="text-center flex-shrink-0 w-14">{{ format(entry) }}</span>
+        <span class="text-left">{{ entry.text }}</span>
+      </template>
+    </TranscriptContent>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
+import TranscriptContent from '@/transcript/components/TranscriptContent.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useTranscriptStore } from '@/transcript/store';
+import { Duration } from 'luxon';
+import { SubtitleEntry } from '@/subtitle/store';
 
-// todo: move stuff to page
 export default defineComponent({
   components: { TranscriptContent },
   setup() {
     const navigationStore = useNavigationStore();
+    const transcriptStore = useTranscriptStore();
     return {
+      transcriptStore,
       toTranscript: () => navigationStore.to("TRANSCRIPT", {contentTransitionName: "content-navigate-deeper" }),
-      follow: ref(true)
+      follow: ref(true),
+      format: (entry: SubtitleEntry) => Duration.fromMillis(entry.from).toFormat('mm:ss')
     };
   }
 });

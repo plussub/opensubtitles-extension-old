@@ -34,21 +34,28 @@
           <template #settings>
             <Settings>
               <template #time-settings-tab-header="{select, selected }">
-                <time-settings-tab-header :selected='selected' @click="select">
+                <TimeSettingsTabHeader :selected='selected' @click="select">
                   <template #label>
                     <span>{{ videoStore.currentTimeAs('hh:mm:ss') }}</span>
                   </template>
-                </time-settings-tab-header>
+                </TimeSettingsTabHeader>
               </template>
               <template #time-settings-tab>
-                <time-settings-tab></time-settings-tab>
+                <TimeSettingsTab/>
               </template>
 
               <template #appearance-settings-tab-header="{select, selected }">
-                <appearance-settings-tab-header :selected='selected' @click="select"/>
+                <AppearanceSettingsTabHeader :selected='selected' @click="select"/>
               </template>
               <template #appearance-settings-tab>
-                <appearance-settings-tab></appearance-settings-tab>
+                <AppearanceSettingsTab/>
+              </template>
+
+              <template #transcript-tab-header="{select, selected }">
+                <TranscriptTabHeader :selected='selected' @click="select" />
+              </template>
+              <template #transcript-tab>
+                <TranscriptTab/>
               </template>
 
               <template #info-tab-header="{select, selected }">
@@ -78,21 +85,28 @@
           <template #settings>
             <Settings>
               <template #time-settings-tab-header="{select, selected }">
-                <time-settings-tab-header :selected='selected' @click="select">
+                <TimeSettingsTabHeader :selected='selected' @click="select">
                   <template #label>
                     <span>{{ videoStore.currentTimeAs('hh:mm:ss') }}</span>
                   </template>
-                </time-settings-tab-header>
+                </TimeSettingsTabHeader>
               </template>
               <template #time-settings-tab>
-                <time-settings-tab></time-settings-tab>
+                <TimeSettingsTab/>
               </template>
 
               <template #appearance-settings-tab-header="{select, selected }">
-                <appearance-settings-tab-header :selected='selected' @click="select"/>
+                <AppearanceSettingsTabHeader :selected='selected' @click="select"/>
               </template>
               <template #appearance-settings-tab>
-                <appearance-settings-tab></appearance-settings-tab>
+                <AppearanceSettingsTab/>
+              </template>
+
+              <template #transcript-tab-header="{select, selected }">
+                <TranscriptTabHeader :selected='selected' @click="select" />
+              </template>
+              <template #transcript-tab>
+                <TranscriptTab/>
               </template>
 
               <template #info-tab-header="{select, selected }">
@@ -130,7 +144,7 @@ import ResultFromFile from '@/file/components/ResultFromFile.vue';
 import FileInfoTabHeader from '@/file/tab/FileInfoTabHeader.vue';
 import FileInfoTab from '@/file/tab/FileInfoTab.vue';
 import PageVideos from '@/video/components/PageVideos.vue';
-import Settings from '@/subtitle/components/Settings.vue';
+import Settings from '@/home/components/Settings.vue';
 import SearchResultInfoTabHeader from '@/search/tab/SearchResultInfoTabHeader.vue';
 import SearchResultInfoTab from '@/search/tab/SearchResultInfoTab.vue';
 import Mention from '@/home/components/Mention.vue';
@@ -148,11 +162,15 @@ import TimeSettingsTabHeader from '@/subtitle/tab/TimeSettingsTabHeader.vue';
 import TimeSettingsTab from '@/subtitle/tab/TimeSettingsTab.vue';
 import AppearanceSettingsTabHeader from '@/appearance/tab/AppearanceSettingsTabHeader.vue';
 import AppearanceSettingsTab from '@/appearance/tab/AppearanceSettingsTab.vue';
+import TranscriptTabHeader from '@/transcript/tab/TranscriptTabHeader.vue';
+import TranscriptTab from '@/transcript/tab/TranscriptTab.vue';
 
 export default defineComponent({
   components: {
-    AppearanceSettingsTab,
+    TranscriptTabHeader,
+    TranscriptTab,
     AppearanceSettingsTabHeader,
+    AppearanceSettingsTab,
     TimeSettingsTab,
     TimeSettingsTabHeader,
     FontAwesomeIcon,
