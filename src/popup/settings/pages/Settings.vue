@@ -25,7 +25,7 @@ import { defineComponent, PropType } from 'vue';
 import { clear as storageClear } from 'storage';
 
 import PageLayout from '@/components/PageLayout.vue';
-import Toolbar from '@/Toolbar/Toolbar.vue';
+import Toolbar from '@/toolbar/Toolbar.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useLanguageStore } from '@/language/store';
 import { useStore as useVideoStore } from '@/video/store';

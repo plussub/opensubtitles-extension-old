@@ -134,7 +134,7 @@ import Settings from '@/subtitle/components/Settings.vue';
 import SearchResultInfoTabHeader from '@/search/tab/SearchResultInfoTabHeader.vue';
 import SearchResultInfoTab from '@/search/tab/SearchResultInfoTab.vue';
 import Mention from '@/home/components/Mention.vue';
-import Toolbar from '@/Toolbar/Toolbar.vue';
+import Toolbar from '@/toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';

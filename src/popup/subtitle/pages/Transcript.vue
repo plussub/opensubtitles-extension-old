@@ -26,7 +26,7 @@ import { defineComponent, PropType } from 'vue';
 import PageLayout from '@/components/PageLayout.vue';
 import LoadingBar from '@/components/LoadingBar.vue';
 import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
-import Toolbar from '@/Toolbar/Toolbar.vue';
+import Toolbar from '@/toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useVideoStore } from '@/video/store';
 // todo: move stuff to store

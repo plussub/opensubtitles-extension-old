@@ -43,7 +43,7 @@ import { download } from '@/search/download';
 
 import SubtitleSearchEntry from '@/search/components/SubtitleSearchEntry.vue';
 import LanguageSelect from '@/components/LanguageSelect/LanguageSelect.vue';
-import Toolbar from '@/Toolbar/Toolbar.vue';
+import Toolbar from '@/toolbar/Toolbar.vue';
 
 import Divider from '@/components/Divider.vue';
 import PageLayout from '@/components/PageLayout.vue';
