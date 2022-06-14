@@ -2,7 +2,7 @@
   <PageLayout :content-transition-name="contentTransitionName">
     <template #toolbar>
       <Toolbar has-back>
-        <a class="self-center pr-4" :title="infoTooltip">
+        <a class="self-center pr-4" :title="[`left click - jump to time point`, `shift + left click - copy text to clipboard`].join('\n')">
           <FontAwesomeIcon icon="question-circle" class="h-icon hover:text-on-primary-hover-500"></FontAwesomeIcon>
         </a>
       </Toolbar>
@@ -10,7 +10,7 @@
     <template #content>
       <div class="w-full h-full grid relative justify-center transcript-content--container">
         <div style="grid-area: bar" class="pt-3 pb-2 bg-primary-50 flex justify-end">
-          <span class="px-4 font-medium">{{ currentTimePretty }}</span>
+          <span class="px-4 font-medium">{{ videoStore.currentTimeAs("mm:ss") }}</span>
         </div>
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
           <LoadingBar class="w-full" />
@@ -22,15 +22,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
-import { Duration } from 'luxon';
-
+import { defineComponent, PropType } from 'vue';
 import PageLayout from '@/components/PageLayout.vue';
 import LoadingBar from '@/components/LoadingBar.vue';
 import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
+import { useStore as useVideoStore } from '@/video/store';
 // todo: move stuff to store
 export default defineComponent({
   components: {
@@ -48,10 +46,9 @@ export default defineComponent({
     }
   },
   setup() {
-    const videoStore = useInjectStore('videoStore');
+    const videoStore = useVideoStore();
     return {
-      currentTimePretty:  computed(() => Duration.fromMillis(parseInt(videoStore.getters.current.value?.lastTimestamp ?? '0' , 10)).toFormat('mm:ss')),
-      infoTooltip: computed(() => [`left click - jump to time point`, `shift + left click - copy text to clipboard`].join('\n'))
+      videoStore
     };
   }
 });

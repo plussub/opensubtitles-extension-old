@@ -16,10 +16,10 @@
 
 <script lang="ts">
 import {computed, defineComponent, PropType, ref, watch} from 'vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 import { binarySearch } from './binarySearch';
 import { Duration } from "luxon";
 import { useStore as useSubtitleStore } from '@/subtitle/store';
+import { useStore as useVideoStore } from '@/video/store';
 // todo: move stuff to store
 export default defineComponent({
   props: {
@@ -31,13 +31,12 @@ export default defineComponent({
   },
   setup(props) {
     const subtitleStore = useSubtitleStore();
-    const videoStore = useInjectStore('videoStore');
-    const currentTime = computed(() => parseInt(videoStore.getters.current.value?.lastTimestamp ?? '0', 10));
+    const videoStore = useVideoStore();
 
     const currentPos = ref(-1);
     const transcriptContentContainer = ref<HTMLElement | null>(null);
 
-    watch(currentTime, (currentTime) => {
+    watch(() => videoStore.currentTime, (currentTime) => {
       const pos = binarySearch(currentTime, subtitleStore.withOffsetParsed);
 
       if (pos === -1) return;
@@ -65,9 +64,8 @@ export default defineComponent({
       ),
       setCurrentTime: ({ time }: { time: number }): void => {
         // +0.001 because the "from" is often the same as previous "to", use this to advoid showing previous subtitle text
-        videoStore.actions.setTime({ time: time + 0.001 });
+        videoStore.setTime({ time: time + 0.001 });
       },
-      currentTimePretty: computed(() => Duration.fromMillis(currentTime.value * 1000).toFormat('mm:ss')),
       copy: ({ text }: { text: string }) => navigator.clipboard.writeText(text)
     };
   }

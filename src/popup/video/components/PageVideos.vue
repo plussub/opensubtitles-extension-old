@@ -4,19 +4,19 @@
       <div>Page Videos</div>
     </div>
     <div style="grid-area: content">
-      <div v-if="videoList.length">
+      <div v-if="videoStore.list.length">
         <div
-          v-for="(video, index) in videoList"
+          v-for="(video, index) in videoStore.list"
           :key="index"
           style="grid-template-columns: 8px 1fr auto"
           class="grid hover:cursor-pointer video-item hover:bg-primary-700 hover:text-on-primary-700"
-          @mouseenter="highlightVideo({ video: video })"
-          @mouseleave="removeHighlightFromVideo"
+          @mouseenter="videoStore.highlight({ video: video })"
+          @mouseleave="videoStore.removeHighlight"
           @click="selectVideo(video)"
         >
           <Divider v-if="index === 0" style="grid-column: 1/3" class="border-surface-200" />
           <div class="flex flex-col gap-1 h-11 my-2 justify-center" style="grid-column: 2 / 3">
-            <div>Video {{ index + 1 }} ({{formatTime(video.lastTimestamp)}})</div>
+            <div>Video {{ index + 1 }} ({{ formatTime(video.lastTimestamp, 'hh:mm:ss') }})</div>
             <div v-if="false" class="text-xs">({{ video.origin }} - {{ video.id }})</div>
           </div>
           <Divider style="grid-column: 1/3" class="border-surface-200" />
@@ -30,10 +30,9 @@
 <script lang="ts">
 import { defineComponent, onUnmounted, PropType } from 'vue';
 import { Duration } from 'luxon';
-import { Video } from '@/video/store';
+import { useStore as useVideoStore, Video } from '@/video/store';
 
 import Divider from '@/components/Divider.vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 // todo: move stuff to store/ page
 export default defineComponent({
   components: {
@@ -47,20 +46,18 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const videoStore = useInjectStore('videoStore');
-    onUnmounted(() => videoStore.actions.removeHighlight());
+    const videoStore = useVideoStore();
+    onUnmounted(() => videoStore.removeHighlight());
 
     return {
-      highlightVideo: videoStore.actions.highlight,
-      removeHighlightFromVideo: videoStore.actions.removeHighlight,
-      videoList: videoStore.getters.list,
+      videoStore,
       selectVideo: async (video: Video) => {
-        await videoStore.actions.setCurrent({ video });
+        await videoStore.setCurrent({ video });
         if(props?.selectFn){
           props.selectFn({video});
         }
       },
-      formatTime: (ms) => Duration.fromMillis(ms).toFormat('hh:mm:ss')
+      formatTime: (ms, fmt) => Duration.fromMillis(ms).toFormat(fmt)
     };
   }
 });

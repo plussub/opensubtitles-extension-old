@@ -4,8 +4,8 @@
       ref="containerRef"
       style="width: calc(100% - 30px)"
       class="h-full relative flex flex-col text-center justify-evenly self-center justify-self-center box-border border-dashed border-2 border-primary-700 hover:bg-surface-100"
-      @mouseenter="highlightCurrentVideo"
-      @mouseleave="removeHighlightFromVideo"
+      @mouseenter="videoStore.highlightCurrent"
+      @mouseleave="videoStore.removeHighlight"
       @dragenter.prevent="dragenter"
       @dragleave="dragleave"
       @drop.prevent="drop"
@@ -23,9 +23,7 @@
       <div class="m-2">
         <p class="m-2">Click or drop file to this area to upload</p>
         <p class="m-2 text-sub-text-on-surface-50 text-sm">
-          Support for a single file upload. Only .srt, .ass, .ssa and .vtt file is acceptable.(Video
-          <span :class="{ 'text-primary-700': videoName !== '1', 'hover:underline': videoName !== '1' }" @click="changeQuery">{{ videoName }}</span>
-          is {{ videoCount === 1 ? 'auto' : '' }} selected)
+          Support for a single file upload. Only .srt, .ass, .ssa and .vtt file is acceptable. (Video is {{ videoStore.count === 1 ? 'auto' : '' }} selected)
         </p>
       </div>
     </div>
@@ -36,13 +34,13 @@
 import { defineComponent, onUnmounted, PropType, ref } from 'vue';
 import { OnLoadPayload, readFile } from './readFile';
 import { getFormatFromFilename } from '@/subtitle/util';
-import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
 import { useStore as useFileStore } from '@/file/store';
+import { useStore as useVideoStore } from '@/video/store';
 
 // todo: move stuff to store
 export default defineComponent({
@@ -59,7 +57,7 @@ export default defineComponent({
     const fileStore = useFileStore();
     const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
-    const videoStore = useInjectStore('videoStore');
+    const videoStore = useVideoStore();
     const trackStore = useTrackStore();
 
     const inputRef = ref<{ files: { name: string } | Blob[] } | null>(null);
@@ -69,7 +67,7 @@ export default defineComponent({
     const dragenter = (): void => containerRef.value.classList.add('bg-surface-200');
     const dragleave = (): void => containerRef.value.classList.remove('bg-surface-200');
 
-    onUnmounted(() => videoStore.actions.removeHighlight());
+    onUnmounted(() => videoStore.removeHighlight());
 
     const showFileErrorMsg = (msg: string) => {
       fileErrorMsg.value = msg;
@@ -88,7 +86,7 @@ export default defineComponent({
         appStore.$reset();
         fileStore.$reset();
         subtitleStore.$reset();
-        videoStore.actions.removeCurrent();
+        videoStore.removeCurrent();
         return;
       }
       subtitleStore.setRaw({ raw: result, format, id: fileName, language: null });
@@ -101,7 +99,7 @@ export default defineComponent({
         appStore.$reset();
         fileStore.$reset();
         subtitleStore.$reset();
-        videoStore.actions.removeCurrent();
+        videoStore.removeCurrent();
         return;
       }
 
@@ -117,10 +115,7 @@ export default defineComponent({
       fileErrorMsg,
       dragenter,
       dragleave,
-      highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),
-      removeHighlightFromVideo: videoStore.actions.removeHighlight,
-      videoCount: videoStore.getters.count,
-      videoName: videoStore.getters.videoName,
+      videoStore,
 
       drop: (event: DragEvent): void => {
         let droppedFiles = event.dataTransfer?.files;

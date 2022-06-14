@@ -2,7 +2,7 @@
   <div class="relative bg-surface-50 grid w-full rounded-lg shadow-lg border border-primary-700 result-from-file--card">
     <div class="absolute flex font-medium top-2.5 right-2.5">
       <div class="text-xs flex align-center text-primary-color-700">
-        <FontAwesomeIcon icon="times" class="h-icon-sm hover:cursor-pointer hover:text-destructive-icon" @click="remove" />
+        <FontAwesomeIcon icon="times" class="h-icon-sm hover:cursor-pointer hover:text-destructive-icon" @click="$emit('remove')" />
       </div>
     </div>
     <div class="flex mt-2 px-2 gap-2" style="grid-area: header">
@@ -11,53 +11,21 @@
     <div style="grid-area: settings">
       <slot name="settings" />
     </div>
-    <SuffixIconButton
-      class="justify-end self-center px-4 flex"
-      style="grid-area: actions"
-      label="Highlight video"
-      icon="crosshairs"
-      @mouseenter="highlightCurrentVideo"
-      @mouseleave="removeHighlightFromVideo"
-    />
+    <div style="grid-area: actions" class="justify-end self-center px-4 flex">
+      <slot name="actions" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue';
-import { useInjectStore } from '@/composables/useInjectStore';
-import SuffixIconButton from '@/components/SuffixIconButton.vue';
+import { defineComponent } from 'vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
-import { useStore as useAppStore } from '@/app/store';
-import { useStore as useSubtitleStore } from '@/subtitle/store';
-import { useStore as useFileStore } from '@/file/store';
 
 export default defineComponent({
   components: {
-    FontAwesomeIcon,
-    SuffixIconButton
+    FontAwesomeIcon
   },
-  setup() {
-    const appStore = useAppStore();
-    const fileStore = useFileStore();
-    const subtitleStore = useSubtitleStore();
-    const videoStore = useInjectStore('videoStore');
-
-    onUnmounted(() => {
-      videoStore.actions.removeHighlight();
-    });
-
-    return {
-      appState: appStore.state,
-      remove: async () => {
-        await videoStore.actions.removeCurrent();
-        appStore.$reset();
-        fileStore.$reset();
-        subtitleStore.$reset();
-      },
-      highlightCurrentVideo: () => videoStore.actions.highlight({ video: videoStore.getters.current.value }),
-      removeHighlightFromVideo: videoStore.actions.removeHighlight,
-    };
-  }
+  emits: ['remove']
 });
 </script>
 

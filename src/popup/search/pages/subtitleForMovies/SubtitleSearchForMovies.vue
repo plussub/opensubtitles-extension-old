@@ -51,15 +51,17 @@ import LoadingBar from '@/components/LoadingBar.vue';
 import InputField from '@/components/InputField.vue';
 import { SubtitleSearchResultData } from '@/search/__gen_gql';
 import OnlyHearingImpairedFilterButton from '@/search/components/OnlyHearingImpairedFilterButton.vue';
-import { ISO639 } from '@/search/store';
+import { ISO639 } from '@/language/store';
 import { from, Subject } from 'rxjs';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { useUnmountObservable } from '@/composables';
-import { useInjectStore } from '@/composables/useInjectStore';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
+import { useStore as useSearchStore } from '@/search/store';
+import { useStore as useLanguageStore } from '@/language/store';
+
 // todo: move stuff to store
 
 export default defineComponent({
@@ -94,7 +96,8 @@ export default defineComponent({
   },
   setup(props) {
     const appStore = useAppStore();
-    const searchStore = useInjectStore('searchStore');
+    const searchStore = useSearchStore();
+    const languageStore = useLanguageStore();
     const subtitleStore = useSubtitleStore();
     const navigationStore = useNavigationStore();
     const trackStore = useTrackStore();
@@ -103,7 +106,7 @@ export default defineComponent({
 
     const filter = ref('');
 
-    const language = ref<ISO639>(searchStore.getters.getPreferredLanguageAsIso639.value);
+    const language = ref<ISO639>(languageStore.getPreferredLanguageAsIso639);
     const showLanguageSelection = ref(false);
 
     const entries = ref<SubtitleSearchResultData[]>([]);
@@ -157,10 +160,10 @@ export default defineComponent({
           return onlyHearingImpaired.value ? intermediate && attributes.hearing_impaired : intermediate;
         })
       ),
-      select: (openSubtitle: SubtitleSearchResultData) => {
+      select: async (openSubtitle: SubtitleSearchResultData) => {
         appStore.$patch({ state: 'SELECTED', src: 'SEARCH'  });
-        searchStore.actions.setPreferredLanguage({ preferredLanguage: language.value.iso639_2 });
-        searchStore.actions.selectOpenSubtitle({
+        await languageStore.setPreferredLanguage(language.value.iso639_2);
+        searchStore.selectOpenSubtitle({
           format: openSubtitle.attributes.format ?? 'srt',
           languageName: openSubtitle.attributes.language,
           rating: openSubtitle.attributes.ratings.toString(),

@@ -9,15 +9,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { useInjectStore } from '@/composables/useInjectStore';
-
 export default defineComponent({
-  setup() {
-    const searchStore = useInjectStore('searchStore');
-    return {
-      format: searchStore.state.value.openSubtitle?.format,
-      language: searchStore.state.value.openSubtitle?.languageName
-    };
+  props: {
+    format: {
+      type: String,
+      default: ""
+    },
+    language: {
+      type: String,
+      default: ""
+    }
   }
 });
 </script>

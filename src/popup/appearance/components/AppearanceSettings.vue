@@ -26,8 +26,8 @@
 <script lang="ts">
 import { computed, defineComponent, ref, watch } from 'vue';
 import RangeInputField from '@/components/RangeInputField.vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 import SnapToLinesHint from 'SnapToLinesHint.vue';
+import { useStore as useAppearanceStore } from '@/appearance/store';
 
 export default defineComponent({
   components: {
@@ -35,30 +35,30 @@ export default defineComponent({
     RangeInputField
   },
   setup() {
-    const appearanceStore = useInjectStore('appearanceStore');
+    const appearanceStore = useAppearanceStore();
 
     const calcColor = (color, fb) => (color ? color.slice(0, 7) : fb);
     const calcTransparency = (color, fb) => parseInt(color && color.length > 7 ? color.slice(-2) : fb, 16).toString();
 
-    const backgroundColor = ref(calcColor(appearanceStore.state.style.value['cssBackgroundColor'], '#000000'));
-    const backgroundColorTransparency = ref(calcTransparency(appearanceStore.state.style.value['cssBackgroundColor'], '00'));
+    const backgroundColor = ref(calcColor(appearanceStore.style['cssBackgroundColor'], '#000000'));
+    const backgroundColorTransparency = ref(calcTransparency(appearanceStore.style['cssBackgroundColor'], '00'));
     const backgroundColorWithTransparency = computed(() => backgroundColor.value + parseInt(backgroundColorTransparency.value, 10).toString(16));
 
-    const color = ref(calcColor(appearanceStore.state.style.value['cssColor'], '#ffffff'));
-    const fontSize = ref(appearanceStore.state.style.value['cssFontSize'] ?? 16);
+    const color = ref(calcColor(appearanceStore.style['cssColor'], '#ffffff'));
+    const fontSize = ref(appearanceStore.style['cssFontSize'] ?? 16);
 
-    const line = ref(appearanceStore.state.style.value['cueLine'] ?? "80")
-    const snapToLines = ref(appearanceStore.state.style.value['cueLine'] ?? false)
+    const line = ref(appearanceStore.style['cueLine'] ?? "80")
+    const snapToLines = ref(appearanceStore.style['cueLine'] ?? false)
 
     watch([color, backgroundColorWithTransparency, fontSize, line, snapToLines], ([cssColor, cssBackgroundColor, cssFontSize, cueLine, cueSnapToLines]) => {
-      appearanceStore.actions.setStyle({
+      appearanceStore.setStyle({
         cssColor,
         cssBackgroundColor,
         cssFontSize,
         cueLine: parseInt(cueLine, 10),
         cueSnapToLines
       });
-      appearanceStore.actions.applyStyle();
+      appearanceStore.applyStyle();
     });
 
     return {

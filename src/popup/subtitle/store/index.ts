@@ -25,19 +25,24 @@ export const useStore = defineStore('subtitle', {
   },
   actions: {
     setRaw({ raw, format, id, language }: {raw: string, format: SubtitleFormat, id: string, language: string|null}) {
-      this.reset();
       this.id = id;
       this.raw = raw;
-      this.format = format;
       this.language = language;
+      this.format = format;
+
+      // this.$reset() and then set property results into a broken persistent state, so do it manually
+      this.parsed = [];
+      this.withOffsetParsed = [];
+      this.offsetTime = 0;
     },
     setOffsetTime({ offsetTime }: {offsetTime: number}){
-      this.offsetTime = offsetTime;
+      const validOffsetTime = Number.isNaN(offsetTime) ? 0 : offsetTime
+      this.offsetTime = validOffsetTime;
       this.withOffsetParsed = this.parsed.map((e) => ({
         ...e,
-        from: e.from + offsetTime,
-        to: e.to + offsetTime
-      }))
+        from: e.from + validOffsetTime,
+        to: e.to + validOffsetTime
+      }));
     },
     parse() {
       const appStore = useAppStore();

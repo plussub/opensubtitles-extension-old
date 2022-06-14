@@ -8,7 +8,7 @@
         <div class="font-header font-medium text-xl">User data</div>
         <div style="grid-area: detail; grid-template-columns: auto 1fr; grid-column-gap: 16px" class="grid w-full leading-relaxed">
           <div style="grid-column: 1 / 2" class="font-medium">Preferred language</div>
-          <div style="grid-column: 2 / 3">{{ preferredLanguage }}</div>
+          <div style="grid-column: 2 / 3">{{ languageStore.preferredLanguage }}</div>
         </div>
         <div class="flex w-full justify-end px-4">
           <a class="text-primary-500 hover:text-primary-700" @click="clearUserData">
@@ -21,13 +21,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { clear as storageClear } from 'storage';
 
 import PageLayout from '@/components/PageLayout.vue';
-import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useLanguageStore } from '@/language/store';
+import { useStore as useVideoStore } from '@/video/store';
 // todo: move stuff to store
 export default defineComponent({
   components: {
@@ -42,17 +43,17 @@ export default defineComponent({
     }
   },
   setup() {
-    const searchStore = useInjectStore('searchStore');
+    const languageStore = useLanguageStore();
     const navigationStore = useNavigationStore();
-    const videoStore = useInjectStore('videoStore');
+    const videoStore = useVideoStore();
 
     return {
-      preferredLanguage: computed(() => searchStore.state.value.preferredLanguage),
+      languageStore,
       clearUserData: async () => {
         await storageClear();
-        searchStore.actions.setPreferredLanguage({ preferredLanguage: 'en' });
+        await languageStore.setPreferredLanguage('en');
       },
-      backFn: () => (videoStore.getters.count.value === 1 ?
+      backFn: () => (videoStore.count === 1 ?
         navigationStore.to("MOVIE-TV-SEARCH", {contentTransitionName: 'content-navigate-shallow'}) :
         navigationStore.to("HOME", {contentTransitionName: 'content-navigate-shallow'}))
     };

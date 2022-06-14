@@ -1,8 +1,8 @@
 <template>
   <PageLayout :content-transition-name="contentTransitionName">
     <template #toolbar>
-      <Toolbar :has-back="videoCount > 1" :back-fn="backFn">
-        <a v-if="videoCount === 1" class="self-center pr-4" @click="toSettings()">
+      <Toolbar :has-back="videoStore.count > 1" :back-fn="backFn">
+        <a v-if="videoStore.count === 1" class="self-center pr-4" @click="toSettings()">
           <FontAwesomeIcon icon="cog" class="h-icon hover:text-on-primary-hover-500"></FontAwesomeIcon>
         </a>
       </Toolbar>
@@ -11,9 +11,9 @@
       <div class="w-full h-full grid relative justify-center search-content--container">
         <div style="grid-area: search-bar" class="pt-3 pb-2 bg-primary-50">
           <InputField v-model="internalQuery" class="px-2" placeholder-icon="search" placeholder="Search movie or series" />
-          <div v-show="videoName !== ''" class="px-5 mt-2 leading-normal text-sm">
+          <div v-show="videoStore.videoName !== ''" class="px-5 mt-2 leading-normal text-sm">
             <div class="italic">Search Suggestion</div>
-            <a class="relative text-primary-700 hover:underline italic" @click="changeQueryToSuggested">{{ videoName }}</a>
+            <a class="relative text-primary-700 hover:underline italic" @click="changeQueryToSuggested">{{ videoStore.videoName }}</a>
           </div>
         </div>
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
@@ -51,10 +51,11 @@ import InputField from '@/components/InputField.vue';
 import { asyncScheduler, from, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { useUnmountObservable } from '@/composables';
-import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
+import { useStore as useSearchStore } from '@/search/store';
+import { useStore as useVideoStore } from '@/video/store';
 // todo: move stuff to store
 export default defineComponent({
   components: {
@@ -80,9 +81,9 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const searchStore = useInjectStore('searchStore');
+    const searchStore = useSearchStore();
     const navigationStore = useNavigationStore();
-    const videoStore = useInjectStore('videoStore');
+    const videoStore = useVideoStore();
 
     const unmountObservable = useUnmountObservable();
 
@@ -126,12 +127,11 @@ export default defineComponent({
       loading,
       entries,
 
-      videoCount: videoStore.getters.count,
-      videoName: videoStore.getters.videoName,
+      videoStore,
       toSettings: () => navigationStore.to("SETTINGS", {contentTransitionName: "content-navigate-deeper"}),
-      changeQueryToSuggested: () => (internalQuery.value = videoStore.getters.videoName.value),
+      changeQueryToSuggested: () => (internalQuery.value = videoStore.videoName),
       select: (tmdb: VideoSearchResultEntry): void => {
-        searchStore.actions.setTmdbInSelection({
+        searchStore.setTmdbInSelection({
           tmdb_id: tmdb.tmdb_id,
           media_type: tmdb.media_type,
           poster_path: tmdb.poster_path ?? null,
@@ -152,7 +152,7 @@ export default defineComponent({
         }
       },
       backFn: async (): Promise<void> => {
-        await videoStore.actions.removeCurrent();
+        await videoStore.removeCurrent();
         navigationStore.to("HOME", { contentTransitionName: "content-navigate-shallow" });
       }
     };
