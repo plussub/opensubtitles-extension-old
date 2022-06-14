@@ -2,7 +2,7 @@
   <div class="px-2 overflow-y-auto">
     <div v-for="(item,idx) in excerpt" :key="idx">
       <div class="mt-4 text-xs font-medium flex items-center">
-        <slot name="from" :to="item.from"></slot>
+        <slot name="from" :from="item.from"></slot>
         <FontAwesomeIcon icon="arrow-right" class="mr-2 h-icon-sm inline-block" />
         <slot name="to" :to="item.to"></slot>
       </div>
