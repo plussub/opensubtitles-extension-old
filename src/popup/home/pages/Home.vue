@@ -44,6 +44,13 @@
                 <time-settings-tab></time-settings-tab>
               </template>
 
+              <template #appearance-settings-tab-header="{select, selected }">
+                <appearance-settings-tab-header :selected='selected' @click="select"/>
+              </template>
+              <template #appearance-settings-tab>
+                <appearance-settings-tab></appearance-settings-tab>
+              </template>
+
               <template #info-tab-header="{select, selected }">
                 <SearchResultInfoTabHeader :selected='selected' @click="select" />
               </template>
@@ -79,6 +86,13 @@
               </template>
               <template #time-settings-tab>
                 <time-settings-tab></time-settings-tab>
+              </template>
+
+              <template #appearance-settings-tab-header="{select, selected }">
+                <appearance-settings-tab-header :selected='selected' @click="select"/>
+              </template>
+              <template #appearance-settings-tab>
+                <appearance-settings-tab></appearance-settings-tab>
               </template>
 
               <template #info-tab-header="{select, selected }">
@@ -132,9 +146,13 @@ import { useStore as useSearchStore } from '@/search/store';
 import { useStringFn } from '@/composables';
 import TimeSettingsTabHeader from '@/subtitle/tab/TimeSettingsTabHeader.vue';
 import TimeSettingsTab from '@/subtitle/tab/TimeSettingsTab.vue';
+import AppearanceSettingsTabHeader from '@/appearance/tab/AppearanceSettingsTabHeader.vue';
+import AppearanceSettingsTab from '@/appearance/tab/AppearanceSettingsTab.vue';
 
 export default defineComponent({
   components: {
+    AppearanceSettingsTab,
+    AppearanceSettingsTabHeader,
     TimeSettingsTab,
     TimeSettingsTabHeader,
     FontAwesomeIcon,
@@ -183,7 +201,6 @@ export default defineComponent({
         subtitleStore.$reset();
         videoStore.removeHighlight();
       },
-      foo: () => console.warn("foo"),
       current: computed(() => {
         if (appStore.state !== 'NONE' && appStore.src === 'SEARCH') {
           return 'search-card';

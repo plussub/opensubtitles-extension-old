@@ -41,7 +41,6 @@ export default defineComponent({
             triggerUpdate = true;
           }
           if (triggerUpdate) {
-            console.warn(triggerUpdate);
             chart.update();
           }
         }

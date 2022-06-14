@@ -48,7 +48,7 @@ export default defineComponent({
     const fontSize = ref(appearanceStore.style['cssFontSize'] ?? 16);
 
     const line = ref(appearanceStore.style['cueLine'] ?? "80")
-    const snapToLines = ref(appearanceStore.style['cueLine'] ?? false)
+    const snapToLines = ref(appearanceStore.style['cueSnapToLines'] ?? false)
 
     watch([color, backgroundColorWithTransparency, fontSize, line, snapToLines], ([cssColor, cssBackgroundColor, cssFontSize, cueLine, cueSnapToLines]) => {
       appearanceStore.setStyle({

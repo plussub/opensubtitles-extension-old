@@ -18,7 +18,6 @@ export const useStore = defineStore('appearance', {
     const storeStyleSubject = new Subject();
     const storeStyleObservable = storeStyleSubject.pipe(
       debounce(() => interval(200)),
-      tap((style) => console.warn({ style })),
       map((style) => storageSet({ style })),
       takeUntil(unmountSubject)
     )
@@ -37,6 +36,7 @@ export const useStore = defineStore('appearance', {
   actions: {
     async initialize() {
       const { style } = await storageGet(['style']);
+      console.warn(style);
       this.allObservables.subscribe();
       this.style = style ?? {};
       this.initialized = true;
