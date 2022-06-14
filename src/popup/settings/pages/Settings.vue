@@ -29,7 +29,7 @@ import Toolbar from '@/toolbar/Toolbar.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useLanguageStore } from '@/language/store';
 import { useStore as useVideoStore } from '@/video/store';
-// todo: move stuff to store
+
 export default defineComponent({
   components: {
     Toolbar,
