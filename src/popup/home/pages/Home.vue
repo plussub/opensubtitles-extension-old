@@ -14,20 +14,20 @@
         :class="{ 'bg-surface-100': current === 'search-card' || current === 'file-card' }">
         <ResultFromSearch
           v-if="current === 'search-card'"
-          :loading="appStore.state !== 'DONE'"
-          :error="appStore.state === 'ERROR'"
-          :title="searchStore.tmdb?.title"
-          :open-subtitles-rating="searchStore.openSubtitle?.rating"
-          :open-subtitles-link="searchStore.openSubtitle?.websiteLink"
-          :tmdb-votes="searchStore.tmdb?.vote_average.toString()"
-          :tmdb-link="searchStore.tmdbLink"
-          :poster-path="searchStore.tmdb?.poster_path"
+          :loading="store.loading"
+          :error="store.error"
+          :title="store.tmbdResult?.title"
+          :open-subtitles-rating="store.openSubtitleResult?.rating"
+          :open-subtitles-link="store.openSubtitleResult?.websiteLink"
+          :tmdb-votes="store.tmbdResult?.vote_average.toString()"
+          :tmdb-link="store.tmdbLink"
+          :poster-path="store.tmbdResult?.poster_path"
           class='m-2'
-          @remove='remove'>
+          @remove='store.removeResult'>
 
           <template #hero-sub-header>
             {{
-              `${capitalize(searchStore.tmdb?.media_type)} ${searchStore.releaseYear ? `/ ${searchStore.releaseYear}` : ''}`
+              `${capitalize(store.tmbdResult?.media_type)} ${store.releaseYear ? `/ ${store.releaseYear}` : ''}`
             }}
           </template>
 
@@ -36,7 +36,7 @@
               <template #time-settings-tab-header="{select, selected }">
                 <TimeSettingsTabHeader :selected='selected' @click="select">
                   <template #label>
-                    <span>{{ videoStore.currentTimeAs('hh:mm:ss') }}</span>
+                    <span>{{ store.currentTimeAs('hh:mm:ss') }}</span>
                   </template>
                 </TimeSettingsTabHeader>
               </template>
@@ -63,8 +63,8 @@
               </template>
               <template #info-tab>
                 <SearchResultInfoTab
-                  :format="searchStore.openSubtitle?.format"
-                  :language="searchStore.openSubtitle?.languageName"
+                  :format="store.openSubtitleResult?.format"
+                  :language="store.openSubtitleResult?.languageName"
                 />
               </template>
             </Settings>
@@ -74,20 +74,20 @@
             <SuffixIconButton
               label='Highlight video'
               icon='crosshairs'
-              @mouseenter='videoStore.highlightCurrent'
-              @mouseleave='videoStore.removeHighlight'
+              @mouseenter='store.highlightCurrentVideo'
+              @mouseleave='store.removeHighlightFromVideo'
             />
           </template>
         </ResultFromSearch>
 
-        <ResultFromFile v-else-if="current === 'file-card'" class='m-2' @remove='remove'>
+        <ResultFromFile v-else-if="current === 'file-card'" class='m-2' @remove='store.removeResult'>
 
           <template #settings>
             <Settings>
               <template #time-settings-tab-header="{select, selected }">
                 <TimeSettingsTabHeader :selected='selected' @click="select">
                   <template #label>
-                    <span>{{ videoStore.currentTimeAs('hh:mm:ss') }}</span>
+                    <span>{{ store.currentTimeAs('hh:mm:ss') }}</span>
                   </template>
                 </TimeSettingsTabHeader>
               </template>
@@ -113,7 +113,7 @@
                 <FileInfoTabHeader :selected='selected' @click="select" />
               </template>
               <template #info-tab>
-                <FileInfoTab :filename="fileStore.filename"/>
+                <FileInfoTab :filename="store.filenameResult"/>
               </template>
             </Settings>
           </template>
@@ -122,13 +122,21 @@
             <SuffixIconButton
               label='Highlight video'
               icon='crosshairs'
-              @mouseenter='videoStore.highlightCurrent'
-              @mouseleave='videoStore.removeHighlight'
+              @mouseenter='store.highlightCurrentVideo'
+              @mouseleave='store.removeHighlightFromVideo'
             />
           </template>
         </ResultFromFile>
 
-        <PageVideos v-else-if="current === 'page-videos'" class='w-full' :select-fn='toSearch' />
+        <PageVideos
+          v-else-if="current === 'page-videos'"
+          class='w-full'
+          :videos='store.videoList'
+          @select='selectVideo'
+          @video-enter='store.highlightVideo'
+          @video-leave='store.removeHighlightFromVideo'
+          @unmount='store.removeHighlightFromVideo'
+        />
         <Mention />
       </div>
     </template>
@@ -153,10 +161,7 @@ import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import SuffixIconButton from '@/components/SuffixIconButton.vue';
-import { useStore as useVideoStore } from '@/video/store';
-import { useStore as useFileStore } from '@/file/store';
-import { useStore as useSubtitleStore } from '@/subtitle/store';
-import { useStore as useSearchStore } from '@/search/store';
+import { useStore } from './homeStore';
 import { useStringFn } from '@/composables';
 import TimeSettingsTabHeader from '@/subtitle/tab/TimeSettingsTabHeader.vue';
 import TimeSettingsTab from '@/subtitle/tab/TimeSettingsTab.vue';
@@ -164,6 +169,7 @@ import AppearanceSettingsTabHeader from '@/appearance/tab/AppearanceSettingsTabH
 import AppearanceSettingsTab from '@/appearance/tab/AppearanceSettingsTab.vue';
 import TranscriptTabHeader from '@/transcript/tab/TranscriptTabHeader.vue';
 import TranscriptTab from '@/transcript/tab/TranscriptTab.vue';
+import { Video } from '@/video/store';
 
 export default defineComponent({
   components: {
@@ -195,29 +201,19 @@ export default defineComponent({
     }
   },
   setup() {
+    const store = useStore();
+
     const appStore = useAppStore();
     const navigationStore = useNavigationStore();
-    const videoStore = useVideoStore();
-    const searchStore = useSearchStore();
-    const fileStore = useFileStore();
-    const subtitleStore = useSubtitleStore();
     const { capitalize } = useStringFn();
 
     return {
+      store,
       capitalize,
-      appStore,
-      videoStore,
-      searchStore,
-      fileStore,
       toSettings: () => navigationStore.to('SETTINGS', { contentTransitionName: 'content-navigate-deeper' }),
-      toSearch: () => navigationStore.to('MOVIE-TV-SEARCH', { contentTransitionName: 'content-navigate-deeper' }),
-      remove: async () => {
-        await videoStore.removeCurrent();
-        appStore.$reset();
-        fileStore.$reset();
-        searchStore.$reset();
-        subtitleStore.$reset();
-        videoStore.removeHighlight();
+      selectVideo: async (video: Video) => {
+        await store.setCurrentVideo({ video });
+        navigationStore.to('MOVIE-TV-SEARCH', { contentTransitionName: 'content-navigate-deeper' })
       },
       current: computed(() => {
         if (appStore.state !== 'NONE' && appStore.src === 'SEARCH') {

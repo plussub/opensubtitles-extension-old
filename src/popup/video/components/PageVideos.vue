@@ -4,15 +4,15 @@
       <div>Page Videos</div>
     </div>
     <div style="grid-area: content">
-      <div v-if="videoStore.list.length">
+      <div v-if="videos.length">
         <div
-          v-for="(video, index) in videoStore.list"
+          v-for="(video, index) in videos"
           :key="index"
           style="grid-template-columns: 8px 1fr auto"
           class="grid hover:cursor-pointer video-item hover:bg-primary-700 hover:text-on-primary-700"
-          @mouseenter="videoStore.highlight({ video: video })"
-          @mouseleave="videoStore.removeHighlight"
-          @click="selectVideo(video)"
+          @mouseenter="$emit('video-enter', {video})"
+          @mouseleave="$emit('video-leave', {video})"
+          @click="$emit('select',video)"
         >
           <Divider v-if="index === 0" style="grid-column: 1/3" class="border-surface-200" />
           <div class="flex flex-col gap-1 h-11 my-2 justify-center" style="grid-column: 2 / 3">
@@ -30,33 +30,25 @@
 <script lang="ts">
 import { defineComponent, onUnmounted, PropType } from 'vue';
 import { Duration } from 'luxon';
-import { useStore as useVideoStore, Video } from '@/video/store';
 
 import Divider from '@/components/Divider.vue';
-// todo: move stuff to store/ page
+import { Video } from '@/video/store';
+
 export default defineComponent({
   components: {
     Divider
   },
   props: {
-    selectFn: {
-      type: Function as PropType<(payload: {video: Video}) => unknown | undefined>,
-      required: false,
-      default: () => undefined
-    }
+    videos: {
+      type: Array as PropType<Video[]>,
+      default: () => []
+    },
   },
-  setup(props) {
-    const videoStore = useVideoStore();
-    onUnmounted(() => videoStore.removeHighlight());
+  emits: ['select', 'unmount', 'video-leave', 'video-enter'],
+  setup(props, {emit}) {
+    onUnmounted(() => emit("unmount"));
 
     return {
-      videoStore,
-      selectVideo: async (video: Video) => {
-        await videoStore.setCurrent({ video });
-        if(props?.selectFn){
-          props.selectFn({video});
-        }
-      },
       formatTime: (ms, fmt) => Duration.fromMillis(ms).toFormat(fmt)
     };
   }
