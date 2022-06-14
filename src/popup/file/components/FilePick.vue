@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, ref } from 'vue';
+import { defineComponent, onUnmounted, PropType, ref } from 'vue';
 import { readFile } from './readFile';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 
@@ -44,7 +44,7 @@ export default defineComponent({
       default: ''
     }
   },
-  emits: ['dropzone-enter', 'dropzone-leave', 'load'],
+  emits: ['dropzone-enter', 'dropzone-leave', 'load', 'unmount'],
   setup(_props, {emit}) {
     const inputRef = ref<{ files: { name: string } | Blob[] } | null>(null);
 
@@ -52,6 +52,8 @@ export default defineComponent({
     const fileErrorMsg = ref('');
     const dragenter = (): void => containerRef.value.classList.add('bg-surface-200');
     const dragleave = (): void => containerRef.value.classList.remove('bg-surface-200');
+
+    onUnmounted(() => emit("unmount"));
 
     const showFileErrorMsg = (msg: string) => {
       fileErrorMsg.value = msg;

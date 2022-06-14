@@ -31,6 +31,7 @@
             v-model:query="internalQuery"
             @dropzone-enter="store.highlightCurrentVideo"
             @dropzone-leave="store.removeHighlightFromVideo"
+            @unmount="store.removeHighlightFromVideo"
             @load="loadFile"
           />
         </div>
