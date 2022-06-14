@@ -1,5 +1,8 @@
 <template>
   <PageLayout :content-transition-name="contentTransitionName" has-back :back-fn="backFn">
+    <template #toolbar>
+      <Toolbar has-back :back-fn="backFn"/>
+    </template>
     <template #content>
       <div class="w-full h-full grid relative justify-center subtitle-selection-content--container">
         <div style="grid-area: filter-bar" class="pt-3 pb-2 bg-primary-50">
@@ -54,6 +57,8 @@ import Divider from '@/components/Divider.vue';
 import PageLayout from '@/components/PageLayout.vue';
 import LoadingBar from '@/components/LoadingBar.vue';
 import InputField from '@/components/InputField.vue';
+import Toolbar from '@/toolbar/Toolbar.vue';
+
 import { from, Subject } from 'rxjs';
 import { switchMap, takeUntil, tap } from 'rxjs/operators';
 import { useUnmountObservable } from '@/composables';
@@ -73,6 +78,7 @@ export default defineComponent({
     InputField,
     LoadingBar,
     Divider,
+    Toolbar,
     SubtitleSearchEntry,
     PageLayout
   },
