@@ -31,7 +31,7 @@ import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
-
+// todo: move stuff to store
 export default defineComponent({
   components: {
     FontAwesomeIcon,

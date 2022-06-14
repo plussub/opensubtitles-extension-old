@@ -54,6 +54,7 @@
 </template>
 
 <script lang="ts">
+// todo: move stuff to page
 import { computed, defineComponent, onUnmounted } from 'vue';
 import LoadingBar from '@/components/LoadingBar.vue';
 import SuffixIconButton from '@/components/SuffixIconButton.vue';

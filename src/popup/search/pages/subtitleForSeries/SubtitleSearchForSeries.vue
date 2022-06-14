@@ -37,7 +37,7 @@
 
 <script lang="ts">
 /* eslint-disable vue/prop-name-casing -- Because props are binded with the api response*/
-
+// todo: move stuff to store
 import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { searchQuery, Seasons, SubtitleSearchForSeriesQueryVariables, SubtitleSearchResultData } from './searchQuery';
 import { ISO639 } from '@/search/store';

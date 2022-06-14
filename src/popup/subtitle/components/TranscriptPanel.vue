@@ -17,6 +17,7 @@ import { defineComponent, ref } from 'vue';
 import TranscriptContent from '@/subtitle/components/TranscriptContent.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
 
+// todo: move stuff to page
 export default defineComponent({
   components: { TranscriptContent },
   setup() {

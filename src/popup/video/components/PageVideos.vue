@@ -34,7 +34,7 @@ import { Video } from '@/video/store';
 
 import Divider from '@/components/Divider.vue';
 import { useInjectStore } from '@/composables/useInjectStore';
-
+// todo: move stuff to store/ page
 export default defineComponent({
   components: {
     Divider

@@ -20,7 +20,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import { binarySearch } from './binarySearch';
 import { Duration } from "luxon";
 import { useStore as useSubtitleStore } from '@/subtitle/store';
-
+// todo: move stuff to store
 export default defineComponent({
   props: {
     follow: {

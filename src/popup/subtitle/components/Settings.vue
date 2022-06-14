@@ -44,7 +44,7 @@ import TimeSettings from '@/subtitle/components/TimeSettings.vue';
 import { useInjectStore } from '@/composables/useInjectStore';
 import TranscriptPanel from "@/subtitle/components/TranscriptPanel.vue";
 import AppearanceSettings from "@/appearance/components/AppearanceSettings.vue";
-
+// todo: move stuff to store
 export default defineComponent({
   components: {
     AppearanceSettings,

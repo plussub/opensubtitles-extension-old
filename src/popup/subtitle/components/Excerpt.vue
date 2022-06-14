@@ -21,6 +21,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 
+// todo: move stuff to store
 export default defineComponent({
   components: { FontAwesomeIcon },
   setup() {

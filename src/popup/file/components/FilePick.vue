@@ -44,6 +44,7 @@ import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
 import { useStore as useFileStore } from '@/file/store';
 
+// todo: move stuff to store
 export default defineComponent({
   components: { FontAwesomeIcon },
   props: {

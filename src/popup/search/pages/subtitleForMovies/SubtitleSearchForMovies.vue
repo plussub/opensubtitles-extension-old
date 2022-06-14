@@ -60,6 +60,7 @@ import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
+// todo: move stuff to store
 
 export default defineComponent({
   components: {

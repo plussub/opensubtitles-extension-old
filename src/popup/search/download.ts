@@ -2,6 +2,7 @@ import { getFormatFromFilename } from '@/subtitle/util';
 import { SubtitleFormat } from '@/subtitle/store';
 import { SubtitleSearchResultData } from './__gen_gql';
 
+// todo: move stuff to store
 export const download = async (entry: SubtitleSearchResultData): Promise<{ raw: string; format: SubtitleFormat }> => {
   const formatArgument = getFormatFromFilename(entry.attributes.files[0].file_name ?? '') ? {} : { sub_format: 'webvtt' };
 

@@ -25,6 +25,7 @@ import NumberInputField from '@/components/NumberInputField.vue';
 import RangeInputField from '@/components/RangeInputField.vue';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 
+// todo: move stuff to store
 export default defineComponent({
   components: {
     RangeInputField,

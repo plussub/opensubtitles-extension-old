@@ -55,7 +55,7 @@ import { useInjectStore } from '@/composables/useInjectStore';
 import Toolbar from '@/Toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
-
+// todo: move stuff to store
 export default defineComponent({
   components: {
     FontAwesomeIcon,
