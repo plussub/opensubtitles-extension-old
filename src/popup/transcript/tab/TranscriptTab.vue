@@ -16,7 +16,7 @@
       @copy="transcriptStore.copy"
       @jump="transcriptStore.jump">
       <template #line="{entry}">
-        <span class="text-center flex-shrink-0 w-14">{{ format(entry) }}</span>
+        <span class="text-center flex-shrink-0 w-14">{{ transcriptStore.formatTime(entry.from) }}</span>
         <span class="text-left">{{ entry.text }}</span>
       </template>
     </TranscriptContent>
@@ -39,8 +39,7 @@ export default defineComponent({
     return {
       transcriptStore,
       toTranscript: () => navigationStore.to("TRANSCRIPT", {contentTransitionName: "content-navigate-deeper" }),
-      follow: ref(true),
-      format: (entry: SubtitleEntry) => Duration.fromMillis(entry.from).toFormat('mm:ss')
+      follow: ref(true)
     };
   }
 });

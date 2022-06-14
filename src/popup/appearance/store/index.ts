@@ -36,7 +36,6 @@ export const useStore = defineStore('appearance', {
   actions: {
     async initialize() {
       const { style } = await storageGet(['style']);
-      console.warn(style);
       this.allObservables.subscribe();
       this.style = style ?? {};
       this.initialized = true;

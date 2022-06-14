@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { SubtitleEntry, useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useVideoStore } from '@/video/store';
 import { findNext } from './findNext';
+import { Duration } from 'luxon';
 
 export const useStore = defineStore('timeSettingsTab', {
   actions: {
@@ -11,6 +12,9 @@ export const useStore = defineStore('timeSettingsTab', {
   },
   getters: {
     offsetTime: () => useSubtitleStore().offsetTime,
+    formatTime(){
+      return (ms) => Duration.fromMillis(ms).toFormat('hh:mm:ss.SSS')
+    },
     currentTime() {
       return useVideoStore().currentTime;
     },

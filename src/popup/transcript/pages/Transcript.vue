@@ -23,7 +23,7 @@
           @copy="transcriptStore.copy"
           @jump="transcriptStore.jump">
           <template #line="{entry}">
-            <span class="text-center flex-shrink-0 w-14">{{ format(entry) }}</span>
+            <span class="text-center flex-shrink-0 w-14">{{ transcriptStore.formatTime(entry.from) }}</span>
             <span class="text-left">{{ entry.text }}</span>
           </template>
         </TranscriptContent>
@@ -41,8 +41,6 @@ import Toolbar from '@/toolbar/Toolbar.vue';
 import FontAwesomeIcon from '@/components/FontAwesomeIcon/FontAwesomeIcon.vue';
 import { useStore as useVideoStore } from '@/video/store';
 import { useStore as useTranscriptStore } from '@/transcript/store';
-import { SubtitleEntry } from '@/subtitle/store';
-import { Duration } from 'luxon';
 export default defineComponent({
   components: {
     FontAwesomeIcon,
@@ -64,8 +62,7 @@ export default defineComponent({
 
     return {
       videoStore,
-      transcriptStore,
-      format: (entry: SubtitleEntry) => Duration.fromMillis(entry.from).toFormat('mm:ss')
+      transcriptStore
     };
   }
 });

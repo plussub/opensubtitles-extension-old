@@ -12,7 +12,7 @@
       </div>
       <div class="text-xs font-medium mt-2 pl-2">
         {{ capitalize(item.media_type) }}
-        {{ item.release_date ? '/ ' + item.release_date.substr(0, 4) : '' }}
+        {{ item.release_date ? '/ ' + item.release_date.substring(0, 4) : '' }}
       </div>
       <div class="text-xs mt-1 pl-2">tmdb {{ item.vote_average }}</div>
     </div>
@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { VideoSearchResultEntry } from './searchQuery';
+import { VideoSearchResultEntry } from '../pages/movieTv/searchQuery';
 import { useStringFn } from '@/composables';
 
 import { default as posterFallback } from '@/res/posterFallback.png';

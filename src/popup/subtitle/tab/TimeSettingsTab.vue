@@ -27,10 +27,10 @@
       style='grid-area: preview; height: 150px; width: calc(100% - 12px)'
       :excerpt='store.excerpt'>
       <template #from='{from}'>
-        <span class="mr-2">{{ formatTime(from) }}</span>
+        <span class="mr-2">{{ store.formatTime(from) }}</span>
       </template>
       <template #to='{to}'>
-        <span>{{ formatTime(to) }}</span>
+        <span>{{ store.formatTime(to) }}</span>
       </template>
     </Excerpt>
 
@@ -49,7 +49,6 @@ import Excerpt from '@/subtitle/components/Excerpt.vue';
 import NumberInputField from '@/components/NumberInputField.vue';
 import RangeInputField from '@/components/RangeInputField.vue';
 import { useStore } from './timeSettingsTabStore';
-import { Duration } from 'luxon';
 
 export default defineComponent({
   components: {
@@ -73,7 +72,6 @@ export default defineComponent({
     return {
       store,
       offsetTime,
-      formatTime: (ms) => Duration.fromMillis(ms).toFormat('hh:mm:ss.SSS'),
       reset: () => (offsetTime.value = 0),
       previewSelection: ref('excerpt')
     };

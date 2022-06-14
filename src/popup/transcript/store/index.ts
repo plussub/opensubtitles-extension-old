@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { SubtitleEntry, useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useVideoStore } from '@/video/store';
 import { findNext } from '@/subtitle/tab/findNext';
+import { Duration } from 'luxon';
 
 export const useStore = defineStore('transcript', {
   actions: {
@@ -13,6 +14,9 @@ export const useStore = defineStore('transcript', {
     }
   },
   getters: {
+    formatTime(){
+      return (ms) => Duration.fromMillis(ms).toFormat('mm:ss')
+    },
     entries(): SubtitleEntry[] {
       return useSubtitleStore().withOffsetParsed
     },
