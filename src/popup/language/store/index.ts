@@ -26,7 +26,7 @@ export const useStore = defineStore('language', {
     }
   },
   getters: {
-    getPreferredLanguageAsIso639: (state): ISO639 =>
+    preferredLanguageAsIso639: (state): ISO639 =>
       languageList.find((e) => e.iso639_2 === state.preferredLanguage) ?? {
         iso639_2: 'en',
         iso639Name: 'English'

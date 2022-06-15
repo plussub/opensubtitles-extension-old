@@ -8,24 +8,24 @@
         <div style="grid-area: filter-bar" class="pt-3 pb-2 bg-primary-50">
           <div class="w-full flex pr-2">
             <div class="w-full">
-              <InputField v-model="filter" placeholder="Filter subtitles" placeholder-icon="filter" class="px-2" />
+              <InputField v-model="internalFilter" placeholder="Filter subtitles" placeholder-icon="filter" class="px-2" />
             </div>
-            <OnlyHearingImpairedFilterButton v-model:only-hearing-impaired="onlyHearingImpaired" />
+            <OnlyHearingImpairedFilterButton v-model:only-hearing-impaired="internalOnlyHearingImpaired" />
           </div>
-          <LanguageSelect v-model:selected="language" v-model:show="showLanguageSelection"></LanguageSelect>
+          <LanguageSelect v-model:selected="internalLanguage" v-model:show="showLanguageSelection"></LanguageSelect>
         </div>
         <div v-show="showSelection" class="w-full h-full overflow-hidden bg-surface-700 bg-opacity-50 backdrop-filter-blur" style="grid-row: 3/5; grid-column: 1/4" />
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
-          <LoadingBar :loading="loading" class="w-full" />
+          <LoadingBar :loading="store.loading" class="w-full" />
         </div>
-        <div v-if="filteredEntries.length" class="overflow-y-auto" style="grid-area: search-results">
-          <div v-for="(item, index) in filteredEntries" :key="index">
+        <div v-if="store.filteredEntries.length" class="overflow-y-auto" style="grid-area: search-results">
+          <div v-for="(item, index) in store.filteredEntries" :key="index">
             <Divider v-if="index === 0" style="grid-column: 1/3" class="border-surface-200" />
             <SubtitleSearchEntry :item="item" @select="select" />
             <Divider class="border-surface-200" />
           </div>
         </div>
-        <div v-else-if="!loading" class="self-center text-center leading-loose" style="grid-area: search-results">
+        <div v-else-if="!store.loading" class="self-center text-center leading-loose" style="grid-area: search-results">
           <div>Sorry, no subtitle found.</div>
           <div>(╯°□°)╯︵ ┻━┻</div>
         </div>
@@ -36,10 +36,7 @@
 
 <script lang="ts">
 /* eslint-disable vue/prop-name-casing -- Because props are binded with the api response*/
-
-import { computed, defineComponent, PropType, ref, watch } from 'vue';
-import { searchQuery, SubtitleSearchForMoviesQueryVariables } from './searchQuery';
-import { download } from '@/search/download';
+import { computed, defineComponent, onUnmounted, PropType, ref, watch } from 'vue';
 
 import SubtitleSearchEntry from '@/search/components/SubtitleSearchEntry.vue';
 import LanguageSelect from '@/components/LanguageSelect/LanguageSelect.vue';
@@ -51,18 +48,8 @@ import LoadingBar from '@/components/LoadingBar.vue';
 import InputField from '@/components/InputField.vue';
 import { SubtitleSearchResultData } from '@/search/__gen_gql';
 import OnlyHearingImpairedFilterButton from '@/search/components/OnlyHearingImpairedFilterButton.vue';
-import { ISO639 } from '@/language/store';
-import { from, Subject } from 'rxjs';
-import { switchMap, takeUntil, tap } from 'rxjs/operators';
-import { useUnmountObservable } from '@/composables';
-import { useStore as useAppStore } from '@/app/store';
 import { useStore as useNavigationStore } from '@/navigation/store';
-import { useStore as useSubtitleStore } from '@/subtitle/store';
-import { useStore as useTrackStore } from '@/track/store';
-import { useStore as useSearchStore } from '@/search/store';
-import { useStore as useLanguageStore } from '@/language/store';
-
-// todo: move stuff to store
+import { useStore } from './subtitleSearchForMoviesStore';
 
 export default defineComponent({
   components: {
@@ -95,94 +82,35 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const appStore = useAppStore();
-    const searchStore = useSearchStore();
-    const languageStore = useLanguageStore();
-    const subtitleStore = useSubtitleStore();
+    const store = useStore();
     const navigationStore = useNavigationStore();
-    const trackStore = useTrackStore();
+    store.initialize();
 
-    const unmountObservable = useUnmountObservable();
-
-    const filter = ref('');
-
-    const language = ref<ISO639>(languageStore.getPreferredLanguageAsIso639);
     const showLanguageSelection = ref(false);
+    const internalLanguage= ref(store.preferredLanguageAsIso639);
 
-    const entries = ref<SubtitleSearchResultData[]>([]);
+    watch(internalLanguage, (language) => {
+      store.$patch({language});
+      store.triggerQuery({ language: language.iso639_2, tmdb_id: props.tmdb_id });
+    }, { immediate: true });
 
-    const loading = ref(true);
+    const internalFilter = ref(store.filter);
+    watch(internalFilter, (filter) => store.$patch({ filter }));
 
-    const searchQuerySubject = new Subject<SubtitleSearchForMoviesQueryVariables>();
-    searchQuerySubject
-      .pipe(
-        tap(() => (loading.value = true)),
-        switchMap((variables) => from(searchQuery(variables))),
-        tap((result) => {
-          loading.value = false;
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          entries.value = result.subtitleSearch.data;
-        }),
-        takeUntil(unmountObservable)
-      )
-      .subscribe();
+    const internalOnlyHearingImpaired = ref(store.onlyHearingImpaired);
+    watch(internalOnlyHearingImpaired, (onlyHearingImpaired) => store.$patch({ onlyHearingImpaired }));
 
-    watch(
-      language,
-      (language) =>
-        searchQuerySubject.next({
-          language: language.iso639_2,
-          tmdb_id: props.tmdb_id
-        }),
-      { immediate: true }
-    );
-
-    const onlyHearingImpaired = ref(false);
-
+    onUnmounted(() => store.unmount());
     return {
-      filter,
-      onlyHearingImpaired,
-
-      language,
+      store,
+      internalLanguage,
+      internalFilter,
+      internalOnlyHearingImpaired,
       showLanguageSelection,
 
       showSelection: computed(() => showLanguageSelection.value),
-
-      loading,
-      entries,
-      filteredEntries: computed(() =>
-        entries.value.filter(({ attributes }) => {
-          if (filter.value === '') {
-            return onlyHearingImpaired.value ? attributes.hearing_impaired : true;
-          }
-          const intermediate = attributes.files[0].file_name?.toLowerCase().includes(filter.value.toLowerCase()) ?? false;
-          return onlyHearingImpaired.value ? intermediate && attributes.hearing_impaired : intermediate;
-        })
-      ),
       select: async (openSubtitle: SubtitleSearchResultData) => {
-        appStore.$patch({ state: 'SELECTED', src: 'SEARCH'  });
-        await languageStore.setPreferredLanguage(language.value.iso639_2);
-        searchStore.selectOpenSubtitle({
-          format: openSubtitle.attributes.format ?? 'srt',
-          languageName: openSubtitle.attributes.language,
-          rating: openSubtitle.attributes.ratings.toString(),
-          websiteLink: openSubtitle.attributes.url
-        });
-
-        download(openSubtitle)
-          .then(({ raw, format }) => {
-            subtitleStore.setRaw({
-              raw,
-              format,
-              id: openSubtitle.attributes.files[0].file_name ?? "-",
-              language: language.value.iso639_2
-            });
-            subtitleStore.parse();
-            trackStore.track({ source: 'search-for-movie', language: language.value.iso639_2 });
-          })
-          .catch(() => appStore.$patch({ state: 'ERROR' }));
-
+        await store.select(openSubtitle);
         navigationStore.to("HOME", { contentTransitionName: 'content-navigate-select-to-home' });
       },
       backFn: (): void =>

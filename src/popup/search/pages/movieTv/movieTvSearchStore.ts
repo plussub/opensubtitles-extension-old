@@ -16,37 +16,36 @@ export const useStore = defineStore('movieTvSearchStore', {
       searchQuerySubject: new Subject<string>(),
       loading: true,
       entries: [] as VideoSearchResultEntry[]
-    }
+    };
   },
   actions: {
     initialize() {
-       const searchQueryObservable = this.searchQuerySubject
-        .pipe(
-          map((q: string) => q.trim()),
-          tap(() => (this.loading = true)),
-          throttleTime(750, asyncScheduler, { trailing: true, leading: true }),
-          switchMap((query: string) =>
-            query !== ''
-              ? from(searchQuery({ query }))
-              : from(Promise.resolve({ videoSearch: { entries: [] }, query: '' }))
-          ),
-          tap((result: VideoSearchQuery & {query: string}) => {
-              this.loading = false;
-              this.entries = result.videoSearch.entries;
-          })
-        )
+      const searchQueryObservable = this.searchQuerySubject.pipe(
+        map((q: string) => q.trim()),
+        tap(() => (this.loading = true)),
+        throttleTime(750, asyncScheduler, { trailing: true, leading: true }),
+        switchMap((query: string) =>
+          query !== ''
+            ? from(searchQuery({ query }))
+            : from(Promise.resolve({ videoSearch: { entries: [] }, query: '' }))
+        ),
+        tap((result: VideoSearchQuery & { query: string }) => {
+          this.loading = false;
+          this.entries = result.videoSearch.entries;
+        })
+      );
 
       merge(
         this.unmountSubject,
         searchQueryObservable,
         this.searchQuerySubject
-      ).pipe(takeUntil(this.unmountSubject)).subscribe()
+      ).pipe(takeUntil(this.unmountSubject)).subscribe();
     },
     unmount() {
       this.unmountSubject.next(undefined);
     },
-    triggerQuery(query: string){
-      this.searchQuerySubject.next(query)
+    triggerQuery(query: string) {
+      this.searchQuerySubject.next(query);
     },
     selectEntry(tmdb: TmdbState) {
       const searchStore = useSearchStore();
@@ -59,16 +58,16 @@ export const useStore = defineStore('movieTvSearchStore', {
         vote_average: tmdb.vote_average ?? 0
       });
     },
-    highlightCurrentVideo(){
+    highlightCurrentVideo() {
       useVideoStore().highlightCurrent();
     },
-    removeHighlightFromVideo(){
+    removeHighlightFromVideo() {
       useVideoStore().removeHighlight();
     },
     async removeCurrentSelectedVideo() {
-      await useVideoStore().removeCurrent()
+      await useVideoStore().removeCurrent();
     },
-    async loadFile ({ filename, result }: {filename: string, result: string }){
+    async loadFile({ filename, result }: { filename: string, result: string }) {
       const fileStore = useFileStore();
       const appStore = useAppStore();
       const subtitleStore = useSubtitleStore();
@@ -80,7 +79,7 @@ export const useStore = defineStore('movieTvSearchStore', {
         fileStore.$reset();
         subtitleStore.$reset();
         await videoStore.removeCurrent();
-      }
+      };
 
       fileStore.$patch({ filename });
       appStore.$patch({ state: 'SELECTED', src: 'FILE' });
@@ -94,7 +93,7 @@ export const useStore = defineStore('movieTvSearchStore', {
       try {
         subtitleStore.parse();
       } catch (e) {
-        await resetAll()
+        await resetAll();
         return;
       }
 
@@ -104,7 +103,7 @@ export const useStore = defineStore('movieTvSearchStore', {
   getters: {
     existsMultipleVideos: () => useVideoStore().count > 1,
     onlySingleVideo: () => useVideoStore().count === 1,
-    existsVideoName: () => useVideoStore().videoName !== "",
+    existsVideoName: () => useVideoStore().videoName !== '',
     videoName: () => useVideoStore().videoName
   }
 });

@@ -13,6 +13,12 @@ generates:
       - typescript-operations
     documents: ./src/popup/search/subtitleSearchFragment.gql
 
+  ./src/popup/download/store/__gen_gql/index.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+    documents: ./src/popup/search/subtitleSearchFragment.gql
+
   ./src/popup/search/pages/subtitleForMovies/searchQuery/__gen_gql/index.ts:
     plugins:
       - typescript
