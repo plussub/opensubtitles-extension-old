@@ -34,7 +34,7 @@
             <Divider class='border-surface-200' />
           </div>
         </div>
-        <div v-else-if='!loading' class='self-center text-center leading-loose' style='grid-area: search-results'>
+        <div v-else-if='!store.loading' class='self-center text-center leading-loose' style='grid-area: search-results'>
           <div>Sorry, no subtitle found.</div>
           <div>(╯°□°)╯︵ ┻━┻</div>
         </div>
@@ -165,8 +165,7 @@ export default defineComponent({
       showSelection: computed(() => showLanguageSelection.value || showSeasonSelection.value || showEpisodeSelection.value),
 
       select: async (openSubtitle: SubtitleSearchResultData) => {
-        await store.select(openSubtitle);
-        navigationStore.to('HOME', { contentTransitionName: 'content-navigate-select-to-home' });
+        await store.select(openSubtitle, () => navigationStore.to('HOME', { contentTransitionName: 'content-navigate-select-to-home' }));
       },
       backFn: (): void =>
         navigationStore.to('MOVIE-TV-SEARCH', {

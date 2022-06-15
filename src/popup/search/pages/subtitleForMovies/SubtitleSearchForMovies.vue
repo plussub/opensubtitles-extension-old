@@ -110,8 +110,7 @@ export default defineComponent({
 
       showSelection: computed(() => showLanguageSelection.value),
       select: async (openSubtitle: SubtitleSearchResultData) => {
-        await store.select(openSubtitle);
-        navigationStore.to("HOME", { contentTransitionName: 'content-navigate-select-to-home' });
+        await store.select(openSubtitle, () => navigationStore.to("HOME", { contentTransitionName: 'content-navigate-select-to-home' }));
       },
       backFn: (): void =>
         navigationStore.to("MOVIE-TV-SEARCH", {

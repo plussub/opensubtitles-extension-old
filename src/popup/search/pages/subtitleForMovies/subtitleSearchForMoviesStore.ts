@@ -48,7 +48,7 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
     triggerQuery(payload: SubtitleSearchForMoviesQueryVariables) {
       this.searchQuerySubject.next(payload);
     },
-    async select(openSubtitle: SubtitleSearchResultData) {
+    async select(openSubtitle: SubtitleSearchResultData, whileDownloadingFn: () => unknown) {
       const appStore = useAppStore();
       const searchStore = useSearchStore();
       const languageStore = useLanguageStore();
@@ -65,6 +65,7 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
         websiteLink: openSubtitle.attributes.url
       });
 
+      whileDownloadingFn()
       const { raw, format } = await downloadStore.download(openSubtitle);
 
       try {
