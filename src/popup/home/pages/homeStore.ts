@@ -38,7 +38,7 @@ export const useStore = defineStore('homeStore', () => {
     tmdbLink: computed(() => useSearchStore().tmdbLink),
     releaseYear: computed(() => useSearchStore().releaseYear),
     currentTimeAs: computed(() => {
-      return (fmt) => useVideoStore().currentTimeAs(fmt)
+      return (fmt) => useVideoStore().currentTimeAs(fmt).value
     }),
     filenameResult: computed(() => useFileStore().filename),
     videoList: computed(() => useVideoStore().list)
