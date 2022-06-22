@@ -10,12 +10,18 @@
     <template #content>
       <div class='w-full h-full grid relative justify-center search-content--container'>
         <div style='grid-area: search-bar' class='pt-3 pb-2 bg-primary-50'>
-          <InputField v-model='internalQuery' class='px-2' placeholder-icon='search'
-                      placeholder='Search movie or series' />
+          <InputField
+            v-model='internalQuery'
+            class='px-2'
+            placeholder-icon='search'
+            placeholder='Search movie or series'
+          />
           <div v-show='store.existsVideoName' class='px-5 mt-2 leading-normal text-sm'>
             <div class='italic'>Search Suggestion</div>
-            <a class='relative text-primary-700 hover:underline italic'
-               @click='changeQueryToSuggested'>{{ store.videoName }}</a>
+            <a
+              class='relative text-primary-700 hover:underline italic'
+              @click='changeQueryToSuggested'>{{ store.videoName }}
+            </a>
           </div>
         </div>
         <div style='grid-area: loading' class='flex items-end flex-wrap bg-primary-50 shadow-md'>
@@ -28,8 +34,10 @@
             <Divider style='grid-column: 1/3' class='border-surface-200' />
           </div>
         </div>
-        <div v-else-if="internalQuery === ''" style='grid-area: search-results; grid-column: 1/2; grid-row: 3/4'
-             class='my-4'>
+        <div
+          v-else-if="internalQuery === ''"
+          style='grid-area: search-results; grid-column: 1/2; grid-row: 3/4'
+          class='my-4'>
           <FilePick
             v-model:query='internalQuery'
             @dropzone-enter='store.highlightCurrentVideo'

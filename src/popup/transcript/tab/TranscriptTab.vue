@@ -28,8 +28,6 @@ import { defineComponent, ref } from 'vue';
 import TranscriptContent from '@/transcript/components/TranscriptContent.vue';
 import { useStore as useNavigationStore } from '@/navigation/store';
 import { useStore as useTranscriptStore } from '@/transcript/store';
-import { Duration } from 'luxon';
-import { SubtitleEntry } from '@/subtitle/store';
 
 export default defineComponent({
   components: { TranscriptContent },

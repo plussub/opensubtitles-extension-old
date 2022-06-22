@@ -10,10 +10,10 @@
     @update:show="$emit('update:show', $event)"
     @filter='(query) => internalList = list.filter(({ language_name, language_code }) => language_name.toLowerCase().startsWith(query.toLowerCase()) || language_code.toLowerCase().startsWith(query.toLowerCase()))'
   >
-    <template #currentSelected="{show}">
+    <template #currentSelected="{show:expanded}">
       <span>Subtitle language:
-        <span v-if='show && hovered' :class="{ 'text-primary-700': show, 'font-medium': show }">{{ hovered.language_name }} ({{ hovered.language_code }})</span>
-        <span v-else :class="{ 'text-primary-700': show, 'font-medium': show }">{{ selected.language_name }} ({{ selected.language_code }})</span>
+        <span v-if='expanded && hovered' :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ hovered.language_name }} ({{ hovered.language_code }})</span>
+        <span v-else :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ selected.language_name }} ({{ selected.language_code }})</span>
       </span>
     </template>
     <template #default="{item}">

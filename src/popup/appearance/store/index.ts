@@ -1,5 +1,5 @@
 import { get as storageGet, set as storageSet } from 'storage';
-import { interval, merge, Subject, tap } from 'rxjs';
+import { interval, merge, Subject } from 'rxjs';
 import { debounce, map, takeUntil } from 'rxjs/operators';
 import { EXTENSION_ORIGIN } from '@/types';
 import { useStore as useContentScriptStore } from '@/contentScript/store';

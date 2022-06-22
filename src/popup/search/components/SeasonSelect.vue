@@ -10,10 +10,10 @@
       @update:show="$emit('update:show', $event)"
       @filter='(q) => query = q'
   >
-    <template #currentSelected="{show}">
+    <template #currentSelected="{show:expanded}">
       <span>Season
-        <span v-if='show && hovered !== null' :class="{ 'text-primary-700': show, 'font-medium': show }">{{ hovered }}</span>
-        <span v-else :class="{ 'text-primary-700': show, 'font-medium': show }">{{ selected  }}</span>
+        <span v-if='expanded && hovered !== null' :class="{ 'text-primary-700': expanded, 'font-medium': show }">{{ hovered }}</span>
+        <span v-else :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ selected  }}</span>
       </span>
     </template>
   </Select>

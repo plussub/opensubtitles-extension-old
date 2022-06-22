@@ -1,6 +1,6 @@
 import { combineLatest, debounceTime, fromEvent, merge, Observable, Subject } from 'rxjs';
 import { filter, map, scan, share, take, takeUntil, tap, bufferCount } from 'rxjs/operators';
-import { onUnmounted, ref } from 'vue';
+import { ref } from 'vue';
 import { nanoid } from 'nanoid';
 import { EXTENSION_ORIGIN } from '@/types';
 import { defineStore } from 'pinia';

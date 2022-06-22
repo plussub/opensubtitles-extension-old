@@ -43,7 +43,7 @@ export const useStore = defineStore('search', () => {
         openSubtitle.value = null;
       },
       releaseYear: computed(() => tmdb.value?.release_date.substring(0, 4) ?? null),
-      tmdbLink: computed((state) => `https://www.themoviedb.org/${tmdb.value?.media_type}/${tmdb.value?.tmdb_id}`)
+      tmdbLink: computed(() => `https://www.themoviedb.org/${tmdb.value?.media_type}/${tmdb.value?.tmdb_id}`)
     };
   },
   {

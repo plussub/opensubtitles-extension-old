@@ -1,4 +1,4 @@
-import { createApp, App } from 'vue';
+import { createApp } from 'vue';
 import appComponent from './App.vue';
 import "@/components/FontAwesomeIcon/fontAwesome";
 import { EXTENSION_ORIGIN } from '@/types';

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { windowStorage } from '@/windowStorage';
 import { SubtitleFormat } from '@/subtitle/store';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 export const useStore = defineStore('file', () => {
     const filename = ref('');

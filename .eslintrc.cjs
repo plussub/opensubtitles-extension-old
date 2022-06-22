@@ -14,7 +14,7 @@ module.exports = {
     sourceType: 'module'
   },
   "rules": {
-    "gh-issue/open-issue": 1,
+    "gh-issue/open-issue": 0,
     "vue/multi-word-component-names": "off",
     "vue/no-reserved-component-names": "off",
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]

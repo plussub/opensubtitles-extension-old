@@ -8,22 +8,32 @@
         <div style='grid-area: filter-bar' class='pt-3 pb-2 bg-primary-50'>
           <div class='w-full flex pr-2'>
             <div class='w-full'>
-              <InputField v-model='internalFilter' placeholder='Filter subtitles' placeholder-icon='filter'
-                          class='px-2' />
+              <InputField
+                v-model='internalFilter'
+                placeholder='Filter subtitles'
+                placeholder-icon='filter'
+                class='px-2' />
             </div>
             <OnlyHearingImpairedFilterButton v-model:only-hearing-impaired='internalOnlyHearingImpaired' />
           </div>
           <div class='w-full flex'>
-            <SeasonSelect v-model:selected='internalSeason' v-model:show='showSeasonSelection'
-                          :count='store.seasonCount'></SeasonSelect>
-            <EpisodeSelect v-model:selected='internalEpisode' v-model:show='showEpisodeSelection'
-                           :count='store.episodeCount'></EpisodeSelect>
+            <SeasonSelect
+              v-model:selected='internalSeason'
+              v-model:show='showSeasonSelection'
+              :count='store.seasonCount'
+            />
+            <EpisodeSelect
+              v-model:selected='internalEpisode'
+              v-model:show='showEpisodeSelection'
+              :count='store.episodeCount'
+            />
           </div>
           <LanguageSelect v-model:selected='internalLanguage' v-model:show='showLanguageSelection' :list="store.contentLanguages"></LanguageSelect>
         </div>
-        <div v-show='showSelection'
-             class='w-full h-full overflow-hidden bg-surface-700 bg-opacity-50 backdrop-filter-blur'
-             style='grid-row: 3/5; grid-column: 1/4' />
+        <div
+          v-show='showSelection'
+          class='w-full h-full overflow-hidden bg-surface-700 bg-opacity-50 backdrop-filter-blur'
+          style='grid-row: 3/5; grid-column: 1/4' />
         <div style='grid-area: loading' class='flex items-end flex-wrap bg-primary-50 shadow-md'>
           <LoadingBar :loading='store.loading' class='w-full' />
         </div>
