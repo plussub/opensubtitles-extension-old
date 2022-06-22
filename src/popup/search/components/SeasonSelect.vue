@@ -12,8 +12,7 @@
   >
     <template #currentSelected="{show:expanded}">
       <span>Season
-        <span v-if='expanded && hovered !== null' :class="{ 'text-primary-700': expanded, 'font-medium': show }">{{ hovered }}</span>
-        <span v-else :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ selected  }}</span>
+        <span :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ hovered ?? selected }}</span>
       </span>
     </template>
   </Select>

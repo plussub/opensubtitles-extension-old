@@ -12,8 +12,7 @@
   >
     <template #currentSelected="{show:expanded}">
       <span>Episode
-        <span v-if='expanded && hovered !== null' :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ hovered === 0 ? 'All' : hovered }}</span>
-        <span v-else :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ selected === 0 ? 'All' : selected }}</span>
+        <span :class="{ 'text-primary-700': expanded, 'font-medium': expanded }">{{ (hovered ?? selected) === 0  ? 'All' : (hovered ?? selected) }}</span>
       </span>
     </template>
     <template #default="{item}">
