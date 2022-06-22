@@ -4,7 +4,7 @@ import { useStore as useFileStore } from '@/file/store';
 import { useStore as useAppStore } from '@/app/store';
 import { useStore as useSubtitleStore } from '@/subtitle/store';
 import { useStore as useTrackStore } from '@/track/store';
-import { TmdbState, useStore as useSearchStore } from '@/search/store';
+import { useStore as useSearchStore } from '@/search/store';
 import { asyncScheduler, from, merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { searchQuery, VideoSearchQuery, VideoSearchResultEntry } from '@/search/pages/movieTv/searchQuery';
@@ -14,8 +14,13 @@ export const useStore = defineStore('movieTvSearchStore', {
     return {
       unmountSubject: new Subject<undefined>(),
       searchQuerySubject: new Subject<string>(),
+      query: "",
       loading: true,
-      entries: [] as VideoSearchResultEntry[]
+      entries: [] as VideoSearchResultEntry[],
+      selected: {
+        tmdb_id: "",
+        media_type: ""
+      }
     };
   },
   actions: {
@@ -44,19 +49,24 @@ export const useStore = defineStore('movieTvSearchStore', {
     unmount() {
       this.unmountSubject.next(undefined);
     },
-    triggerQuery(query: string) {
-      this.searchQuerySubject.next(query);
+    triggerQuery() {
+      this.searchQuerySubject.next(this.query);
     },
-    selectEntry(tmdb: TmdbState) {
+    selectEntry(entry: VideoSearchResultEntry) {
       const searchStore = useSearchStore();
       searchStore.setTmdbInSelection({
-        tmdb_id: tmdb.tmdb_id,
-        media_type: tmdb.media_type,
-        poster_path: tmdb.poster_path ?? null,
-        release_date: tmdb.release_date ?? '',
-        title: tmdb.title,
-        vote_average: tmdb.vote_average ?? 0
+        tmdb_id: entry.tmdb_id,
+        media_type: entry.media_type,
+        poster_path: entry.poster_path ?? null,
+        release_date: entry.release_date ?? '',
+        title: entry.title,
+        vote_average: entry.vote_average ?? 0
       });
+
+      this.selected = {
+        media_type: entry.media_type,
+        tmdb_id: entry.tmdb_id
+      }
     },
     highlightCurrentVideo() {
       useVideoStore().highlightCurrent();
@@ -104,6 +114,17 @@ export const useStore = defineStore('movieTvSearchStore', {
     existsMultipleVideos: () => useVideoStore().count > 1,
     onlySingleVideo: () => useVideoStore().count === 1,
     existsVideoName: () => useVideoStore().videoName !== '',
-    videoName: () => useVideoStore().videoName
+    videoName: () => useVideoStore().videoName,
+    selectedNavigateTo(){
+      return this.selected.media_type === 'movie' ? "SUBTITLE-SEARCH-FOR-MOVIES" as const : "SUBTITLE-SEARCH-FOR-SERIES" as const;
+    },
+    selectedNavigatePayload(){
+      return {
+        tmdb_id: this.selected.tmdb_id,
+        media_type: this.selected.media_type,
+        searchQuery: this.query,
+        contentTransitionName: 'content-navigate-deeper' as const
+      }
+    }
   }
 });

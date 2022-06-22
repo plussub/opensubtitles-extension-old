@@ -20,7 +20,8 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
       unmountSubject: new Subject<undefined>(),
       searchQuerySubject: new Subject<SubtitleSearchForMoviesQueryVariables>(),
       loading: true,
-      language: useLanguageStore().preferredLanguageAsIso639,
+      tmdb_id: "",
+      language: useLanguageStore().preferredContentLanguage,
       filter: '',
       onlyHearingImpaired: false,
       entries: [] as SubtitleSearchResultData[]
@@ -45,8 +46,11 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
     unmount() {
       this.unmountSubject.next(undefined);
     },
-    triggerQuery(payload: SubtitleSearchForMoviesQueryVariables) {
-      this.searchQuerySubject.next(payload);
+    triggerQuery() {
+      this.searchQuerySubject.next({
+        language: this.language.language_code,
+        tmdb_id: this.tmdb_id
+      });
     },
     async select(openSubtitle: SubtitleSearchResultData, whileDownloadingFn: () => unknown) {
       const appStore = useAppStore();
@@ -57,7 +61,7 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
       const downloadStore = useDownloadStore();
 
       appStore.$patch({ state: 'SELECTED', src: 'SEARCH' });
-      await languageStore.setPreferredLanguage(this.language.iso639_2);
+      await languageStore.setPreferredContentLanguage(this.language);
       searchStore.selectOpenSubtitle({
         format: openSubtitle.attributes.format ?? 'srt',
         languageName: openSubtitle.attributes.language,
@@ -79,11 +83,11 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
       } catch (e) {
         appStore.$patch({ state: 'ERROR' });
       }
-      await trackStore.track({ source: 'search-for-movie', language: this.language.iso639_2 });
+      await trackStore.track({ source: 'search-for-movie', language: this.language.language_code });
     }
   },
   getters: {
-    preferredLanguageAsIso639: () => useLanguageStore().preferredLanguageAsIso639,
+    contentLanguages: () => useLanguageStore().contentLanguages,
     filteredEntries() {
       return this.entries.filter(({ attributes }) => {
         if (this.filter === '') {

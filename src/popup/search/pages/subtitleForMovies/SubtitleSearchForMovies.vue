@@ -12,7 +12,7 @@
             </div>
             <OnlyHearingImpairedFilterButton v-model:only-hearing-impaired="internalOnlyHearingImpaired" />
           </div>
-          <LanguageSelect v-model:selected="internalLanguage" v-model:show="showLanguageSelection"></LanguageSelect>
+          <LanguageSelect v-model:selected="internalLanguage" v-model:show="showLanguageSelection" :list="store.contentLanguages"></LanguageSelect>
         </div>
         <div v-show="showSelection" class="w-full h-full overflow-hidden bg-surface-700 bg-opacity-50 backdrop-filter-blur" style="grid-row: 3/5; grid-column: 1/4" />
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
@@ -39,7 +39,7 @@
 import { computed, defineComponent, onUnmounted, PropType, ref, watch } from 'vue';
 
 import SubtitleSearchEntry from '@/search/components/SubtitleSearchEntry.vue';
-import LanguageSelect from '@/components/LanguageSelect/LanguageSelect.vue';
+import LanguageSelect from '@/language/components/LanguageSelect.vue';
 import Toolbar from '@/toolbar/Toolbar.vue';
 
 import Divider from '@/components/Divider.vue';
@@ -85,13 +85,14 @@ export default defineComponent({
     const store = useStore();
     const navigationStore = useNavigationStore();
     store.initialize();
+    store.$patch({tmdb_id: props.tmdb_id});
 
     const showLanguageSelection = ref(false);
-    const internalLanguage= ref(store.preferredLanguageAsIso639);
+    const internalLanguage = ref(store.language);
 
     watch(internalLanguage, (language) => {
       store.$patch({language});
-      store.triggerQuery({ language: language.iso639_2, tmdb_id: props.tmdb_id });
+      store.triggerQuery();
     }, { immediate: true });
 
     const internalFilter = ref(store.filter);

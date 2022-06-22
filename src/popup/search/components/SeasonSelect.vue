@@ -2,20 +2,24 @@
   <Select
       :selected="selected"
       :show="show"
-      :options="seasonList"
-      :filter-fn="filter"
+      :options="internalList"
       filter-placeholder="Filter episodes"
       class="px-2 mt-2"
+      @hovered='(o) => hovered = o'
       @update:selected="$emit('update:selected', $event)"
       @update:show="$emit('update:show', $event)"
+      @filter='(q) => query = q'
   >
-    <template #currentSelected>
-      <span>Season {{ selected }}</span>
+    <template #currentSelected="{show}">
+      <span>Season
+        <span v-if='show && hovered !== null' :class="{ 'text-primary-700': show, 'font-medium': show }">{{ hovered }}</span>
+        <span v-else :class="{ 'text-primary-700': show, 'font-medium': show }">{{ selected  }}</span>
+      </span>
     </template>
   </Select>
 </template>
 <script lang="ts">
-import {computed, defineComponent, PropType, watch} from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { default as Select } from '@/components/Select.vue';
 
 export default defineComponent({
@@ -40,14 +44,27 @@ export default defineComponent({
   emits: ['update:selected', 'update:show'],
   setup(props, {emit}) {
     const seasonList = computed(() => Array.from({ length: props.count }).map((_, index) => index + 1));
+    const query = ref("");
+
     watch(() => props.count, () => {
       if(props.count < props.selected){
         emit('update:selected', 0)
       }
     });
+
+    const hovered = ref(null)
+
+    const internalList = computed(() => {
+      if(query.value.trim() === ""){
+        return seasonList.value;
+      }
+      return seasonList.value.filter((e) => e.toString() === query.value.toString());
+    });
+
     return {
-      seasonList,
-      filter: (query: string) => seasonList.value.filter((e) => e.toString() === query.toString()),
+      query,
+      hovered,
+      internalList,
     };
   }
 });

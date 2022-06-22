@@ -19,7 +19,7 @@
             <EpisodeSelect v-model:selected='internalEpisode' v-model:show='showEpisodeSelection'
                            :count='store.episodeCount'></EpisodeSelect>
           </div>
-          <LanguageSelect v-model:selected='internalLanguage' v-model:show='showLanguageSelection'></LanguageSelect>
+          <LanguageSelect v-model:selected='internalLanguage' v-model:show='showLanguageSelection' :list="store.contentLanguages"></LanguageSelect>
         </div>
         <div v-show='showSelection'
              class='w-full h-full overflow-hidden bg-surface-700 bg-opacity-50 backdrop-filter-blur'
@@ -47,7 +47,7 @@
 /* eslint-disable vue/prop-name-casing -- Because props are binded with the api response*/
 import { computed, defineComponent, onUnmounted, PropType, ref, watch } from 'vue';
 import OnlyHearingImpairedFilterButton from '@/search/components/OnlyHearingImpairedFilterButton.vue';
-import LanguageSelect from '@/components/LanguageSelect/LanguageSelect.vue';
+import LanguageSelect from '@/language/components/LanguageSelect.vue';
 import SeasonSelect from '../../components/SeasonSelect.vue';
 import EpisodeSelect from '../../components/EpisodeSelect.vue';
 import SubtitleSearchEntry from '@/search/components/SubtitleSearchEntry.vue';
@@ -96,8 +96,9 @@ export default defineComponent({
     const store = useStore();
     const navigationStore = useNavigationStore();
     store.initialize();
+    store.$patch({tmdb_id: props.tmdb_id});
 
-    const internalLanguage = ref(store.preferredLanguageAsIso639);
+    const internalLanguage = ref(store.language);
     const showLanguageSelection = ref(false);
 
     const internalFilter = ref(store.filter);
@@ -109,11 +110,7 @@ export default defineComponent({
     const internalEpisode = ref(store.episode);
     const showEpisodeSelection = ref(false);
 
-    const setSetShowSelection = (apply: boolean, {
-      language,
-      season,
-      episode
-    }: { language: boolean; season: boolean; episode: boolean }) => {
+    const setSetShowSelection = (apply: boolean, { language, season, episode }: { language: boolean; season: boolean; episode: boolean }) => {
       if (!apply) {
         return;
       }
@@ -121,11 +118,7 @@ export default defineComponent({
       showSeasonSelection.value = season;
       showEpisodeSelection.value = episode;
     };
-    watch(showLanguageSelection, (show) => setSetShowSelection(show, {
-      language: show,
-      season: false,
-      episode: false
-    }));
+    watch(showLanguageSelection, (show) => setSetShowSelection(show, { language: show, season: false, episode: false }));
     watch(showSeasonSelection, (show) => setSetShowSelection(show, { language: false, season: show, episode: false }));
     watch(showEpisodeSelection, (show) => setSetShowSelection(show, { language: false, season: false, episode: show }));
 
@@ -133,12 +126,7 @@ export default defineComponent({
       [internalLanguage, internalSeason, internalEpisode],
       ([language, season, episode]) => {
         store.$patch({ language, season, episode });
-        store.triggerQuery({
-          language: language.iso639_2,
-          tmdb_id: props.tmdb_id,
-          season_number: season,
-          episode_number: episode
-        });
+        store.triggerQuery();
       },
       { immediate: true }
     );

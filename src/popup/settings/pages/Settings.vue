@@ -8,7 +8,7 @@
         <div class="font-header font-medium text-xl">User data</div>
         <div style="grid-area: detail; grid-template-columns: auto 1fr; grid-column-gap: 16px" class="grid w-full leading-relaxed">
           <div style="grid-column: 1 / 2" class="font-medium">Preferred language</div>
-          <div style="grid-column: 2 / 3">{{ languageStore.preferredLanguage }}</div>
+          <div style="grid-column: 2 / 3">{{ languageStore.preferredContentLanguage.language_name }}({{ languageStore.preferredContentLanguage.language_code }})</div>
         </div>
         <div class="flex w-full justify-end px-4">
           <a class="text-primary-500 hover:text-primary-700" @click="clearUserData">
@@ -51,7 +51,7 @@ export default defineComponent({
       languageStore,
       clearUserData: async () => {
         await storageClear();
-        await languageStore.setPreferredLanguage('en');
+        await languageStore.resetPreferredContentLanguageToDefault();
       },
       backFn: () => (videoStore.count === 1 ?
         navigationStore.to("MOVIE-TV-SEARCH", {contentTransitionName: 'content-navigate-shallow'}) :

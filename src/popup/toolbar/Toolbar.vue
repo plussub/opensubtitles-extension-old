@@ -40,7 +40,7 @@ export default defineComponent({
       required: false,
       default: false
     },
-    // todo replace with even
+    // todo replace with event
     backFn: {
       type: Function as PropType<() => unknown | undefined>,
       required: false,

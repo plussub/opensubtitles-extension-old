@@ -2,24 +2,28 @@
   <Select
     :selected="selected"
     :show="show"
-    :options="episodeList"
-    :filter-fn="filter"
+    :options="internalList"
     filter-placeholder="Filter episodes"
     class="px-2 mt-2"
+    @hovered='(o) => hovered = o'
     @update:selected="$emit('update:selected', $event)"
     @update:show="$emit('update:show', $event)"
+    @filter='(q) => query = q'
   >
-    <template #currentSelected>
-      <span>Episode {{ selected === 0 ? 'All' : selected }}</span>
+    <template #currentSelected="{show}">
+      <span>Episode
+        <span v-if='show && hovered !== null' :class="{ 'text-primary-700': show, 'font-medium': show }">{{ hovered === 0 ? 'All' : hovered }}</span>
+        <span v-else :class="{ 'text-primary-700': show, 'font-medium': show }">{{ selected === 0 ? 'All' : selected }}</span>
+      </span>
     </template>
-    <template #default="slotProps">
-      <span>{{ slotProps.item === 0 ? 'All' : slotProps.item }}</span>
+    <template #default="{item}">
+      <span>{{ item === 0 ? 'All' : item }}</span>
     </template>
   </Select>
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, PropType, watch} from 'vue';
+import { computed, defineComponent, PropType, ref, watch } from 'vue';
 import { default as Select } from '@/components/Select.vue';
 
 export default defineComponent({
@@ -44,14 +48,26 @@ export default defineComponent({
   emits: ['update:selected', 'update:show'],
   setup(props, {emit}) {
     const episodeList = computed(() => [0, ...Array.from({ length: props.count }).map((_, index) => index + 1)]);
+    const query = ref("");
+
     watch(() => props.count, () => {
       if(props.count < props.selected){
         emit('update:selected', 0)
       }
     });
+    const hovered = ref(null)
+
+    const internalList = computed(() => {
+      if(query.value.trim() === ""){
+        return episodeList.value;
+      }
+      return episodeList.value.filter((e) => e.toString() === query.value.toString());
+    });
+
     return {
-      episodeList,
-      filter: (query: string) => episodeList.value.filter((e) => e.toString() === query.toString())
+      query,
+      hovered,
+      internalList
     };
   }
 });
