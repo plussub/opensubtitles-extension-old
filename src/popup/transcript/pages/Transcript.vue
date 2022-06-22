@@ -10,7 +10,7 @@
     <template #content>
       <div class="w-full h-full grid relative justify-center transcript-content--container">
         <div style="grid-area: bar" class="pt-3 pb-2 bg-primary-50 flex justify-end">
-          <span class="px-4 font-medium">{{ videoStore.currentTimeAs("mm:ss") }}</span>
+          <span class="px-4 font-medium">{{ videoStore.currentTimeAs("mm:ss").value }}</span>
         </div>
         <div style="grid-area: loading" class="flex items-end flex-wrap bg-primary-50 shadow-md">
           <LoadingBar class="w-full" />
