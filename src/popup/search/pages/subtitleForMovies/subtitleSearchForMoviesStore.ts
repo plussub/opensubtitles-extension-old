@@ -13,43 +13,49 @@ import {
   SubtitleSearchForMoviesQuery,
   SubtitleSearchForMoviesQueryVariables
 } from '@/search/pages/subtitleForMovies/searchQuery';
+import { computed, ref } from 'vue';
 
-export const useStore = defineStore('subtitleSearchForMoviesStore', {
-  state: () => {
-    return {
-      unmountSubject: new Subject<undefined>(),
-      searchQuerySubject: new Subject<SubtitleSearchForMoviesQueryVariables>(),
-      loading: true,
-      tmdb_id: "",
-      language: useLanguageStore().preferredContentLanguage,
-      filter: '',
-      onlyHearingImpaired: false,
-      entries: [] as SubtitleSearchResultData[]
-    };
-  },
-  actions: {
+export const useStore = defineStore('subtitleSearchForMoviesStore', () => {
+  const unmountSubject = new Subject<undefined>();
+  const searchQuerySubject = new Subject<SubtitleSearchForMoviesQueryVariables>();
+  const loading = ref(true);
+  const tmdb_id = ref('');
+  const language = ref(useLanguageStore().preferredContentLanguage);
+  const filter = ref('');
+  const onlyHearingImpaired = ref(false);
+  const entries = ref<Omit<SubtitleSearchResultData, "id" | "type">[]>([]);
+
+  const searchQueryObservable = searchQuerySubject.pipe(
+    tap(() => (loading.value = true)),
+    switchMap((variables: SubtitleSearchForMoviesQueryVariables) => from(searchQuery(variables))),
+    tap((result: SubtitleSearchForMoviesQuery) => {
+      loading.value = false;
+      entries.value = result.subtitleSearch.data;
+    })
+  );
+  const allObservables = merge(
+    unmountSubject,
+    searchQueryObservable,
+    searchQuerySubject
+  ).pipe(takeUntil(unmountSubject));
+
+  return {
+    loading,
+    tmdb_id,
+    language,
+    filter,
+    onlyHearingImpaired,
+    entries,
     initialize() {
-      const searchQueryObservable = this.searchQuerySubject.pipe(
-        tap(() => (this.loading = true)),
-        switchMap((variables: SubtitleSearchForMoviesQueryVariables) => from(searchQuery(variables))),
-        tap((result: SubtitleSearchForMoviesQuery) => {
-          this.loading = false;
-          this.entries = result.subtitleSearch.data;
-        })
-      );
-      merge(
-        this.unmountSubject,
-        searchQueryObservable,
-        this.searchQuerySubject
-      ).pipe(takeUntil(this.unmountSubject)).subscribe();
+      allObservables.subscribe();
     },
     unmount() {
-      this.unmountSubject.next(undefined);
+      unmountSubject.next(undefined);
     },
     triggerQuery() {
-      this.searchQuerySubject.next({
-        language: this.language.language_code,
-        tmdb_id: this.tmdb_id
+      searchQuerySubject.next({
+        language: language.value.language_code,
+        tmdb_id: tmdb_id.value
       });
     },
     async select(openSubtitle: SubtitleSearchResultData, whileDownloadingFn: () => unknown) {
@@ -69,7 +75,7 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
         websiteLink: openSubtitle.attributes.url
       });
 
-      whileDownloadingFn()
+      whileDownloadingFn();
       const { raw, format } = await downloadStore.download(openSubtitle);
 
       try {
@@ -84,18 +90,16 @@ export const useStore = defineStore('subtitleSearchForMoviesStore', {
         appStore.$patch({ state: 'ERROR' });
       }
       await trackStore.track({ source: 'search-for-movie', language: this.language.language_code });
-    }
-  },
-  getters: {
-    contentLanguages: () => useLanguageStore().contentLanguages,
-    filteredEntries() {
-      return this.entries.filter(({ attributes }) => {
-        if (this.filter === '') {
-          return this.onlyHearingImpaired ? attributes.hearing_impaired : true;
+    },
+    contentLanguages: computed(() => useLanguageStore().contentLanguages),
+    filteredEntries: computed(() => {
+      return entries.value.filter(({ attributes }) => {
+        if (filter.value === '') {
+          return onlyHearingImpaired.value ? attributes.hearing_impaired : true;
         }
-        const intermediate = attributes.files[0].file_name?.toLowerCase().includes(this.filter.toLowerCase()) ?? false;
-        return this.onlyHearingImpaired ? intermediate && attributes.hearing_impaired : intermediate;
+        const intermediate = attributes.files[0].file_name?.toLowerCase().includes(filter.value.toLowerCase()) ?? false;
+        return onlyHearingImpaired.value ? intermediate && attributes.hearing_impaired : intermediate;
       });
-    }
-  }
+    })
+  };
 });

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { windowStorage } from '@/windowStorage';
+import { computed, ref } from 'vue';
 
 export interface TmdbState {
   tmdb_id: string;
@@ -17,32 +18,37 @@ export interface OpensubtitlesState {
   languageName: string;
 }
 
-export const useStore = defineStore('search', {
-  state: () => {
+export const useStore = defineStore('search', () => {
+
+    const inSelectionTmdb = ref<TmdbState | null>(null);
+    const tmdb = ref<TmdbState | null>(null);
+    const openSubtitle = ref<OpensubtitlesState | null>(null);
     return {
-      inSelectionTmdb: null as TmdbState | null,
-      tmdb: null as TmdbState | null,
-      openSubtitle: null as OpensubtitlesState | null
+      inSelectionTmdb,
+      tmdb,
+      openSubtitle,
+      selectOpenSubtitle(payload: OpensubtitlesState) {
+        tmdb.value = inSelectionTmdb.value;
+        inSelectionTmdb.value = null;
+        openSubtitle.value = payload;
+      },
+      setTmdbInSelection(payload: TmdbState) {
+        inSelectionTmdb.value = payload;
+        tmdb.value = null;
+        openSubtitle.value = null;
+      },
+      reset(){
+        tmdb.value = null
+        inSelectionTmdb.value = null;
+        openSubtitle.value = null;
+      },
+      releaseYear: computed(() => tmdb.value?.release_date.substring(0, 4) ?? null),
+      tmdbLink: computed((state) => `https://www.themoviedb.org/${tmdb.value?.media_type}/${tmdb.value?.tmdb_id}`)
+    };
+  },
+  {
+    persist: {
+      key: 'search',
+      storage: windowStorage
     }
-  },
-  actions: {
-    selectOpenSubtitle(payload: OpensubtitlesState){
-      this.tmdb = this.inSelectionTmdb;
-      this.inSelectionTmdb = null;
-      this.openSubtitle = payload
-    },
-    setTmdbInSelection(payload: TmdbState) {
-      this.inSelectionTmdb = payload;
-      this.tmdb = null;
-      this.openSubtitle = null;
-    }
-  },
-  getters: {
-    releaseYear: (state) => state.tmdb?.release_date.substring(0, 4) ?? null,
-    tmdbLink: (state) => `https://www.themoviedb.org/${state.tmdb?.media_type}/${state.tmdb?.tmdb_id}`
-  },
-  persist: {
-    key: 'search',
-    storage: windowStorage
-  }
-});
+  });

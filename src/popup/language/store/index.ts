@@ -1,29 +1,30 @@
 import { defineStore } from 'pinia';
 import { get as storageGet, set as storageSet } from 'storage';
 import { ContentLanguage, listContentLanguagesQuery } from '@/language/store/listContentLanguagesQuery';
+import { ref } from 'vue';
 
-export const useStore = defineStore('language', {
-  state: () => {
-    return {
-      preferredContentLanguage: {language_code: "en", language_name: "English"} as ContentLanguage,
-      contentLanguages: [] as ContentLanguage[],
-      initialized: false
-    }
-  },
-  actions: {
+export const useStore = defineStore('language', () => {
+  const initialized = ref(false);
+  const preferredContentLanguage = ref<ContentLanguage>({language_code: "en", language_name: "English"});
+  const contentLanguages = ref<ContentLanguage[]>([]);
+  const setPreferredContentLanguage = async (newPreferredContentLanguage: ContentLanguage) => {
+    preferredContentLanguage.value = newPreferredContentLanguage;
+    await storageSet({ preferredContentLanguage: newPreferredContentLanguage });
+  };
+
+  return {
+    preferredContentLanguage,
+    contentLanguages,
+    initialized,
     async initialize() {
-      const {preferredContentLanguage} = await storageGet(['preferredContentLanguage']);
-      this.preferredContentLanguage = preferredContentLanguage ?? {language_code: "en", language_name: "English"};
-
-      this.contentLanguages = (await listContentLanguagesQuery()).listContentLanguages.data;
-      this.initialized = true;
+      const {preferredContentLanguage: loadedPreferredContentLanguage} = await storageGet(['preferredContentLanguage']);
+      preferredContentLanguage.value = loadedPreferredContentLanguage ?? {language_code: "en", language_name: "English"};
+      contentLanguages.value = (await listContentLanguagesQuery()).listContentLanguages.data;
+      initialized.value = true;
     },
-    async setPreferredContentLanguage(preferredContentLanguage: ContentLanguage){
-      this.preferredContentLanguage = preferredContentLanguage;
-      await storageSet({ preferredContentLanguage });
-    },
+    setPreferredContentLanguage,
     async resetPreferredContentLanguageToDefault() {
-      return this.setPreferredContentLanguage({language_code: "en", language_name: "English"});
+      return setPreferredContentLanguage({language_code: "en", language_name: "English"});
     }
-  }
+  };
 })

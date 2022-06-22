@@ -13,49 +13,59 @@ import {
   SubtitleSearchForSeriesQuery,
   SubtitleSearchForSeriesQueryVariables
 } from '@/search/pages/subtitleForSeries/searchQuery';
+import { computed, ref } from 'vue';
 
-export const useStore = defineStore('subtitleSearchForSeriesStore', {
-  state: () => {
-    return {
-      unmountSubject: new Subject<undefined>(),
-      searchQuerySubject: new Subject<SubtitleSearchForSeriesQueryVariables>(),
-      loading: true,
-      tmdb_id: "",
-      language: useLanguageStore().preferredContentLanguage,
-      filter: '',
-      onlyHearingImpaired: false,
-      entries: [] as SubtitleSearchResultData[],
-      seasons: [] as Seasons[],
-      season: 1,
-      episode: 0
-    };
-  },
-  actions: {
+export const useStore = defineStore('subtitleSearchForSeriesStore', () => {
+  const unmountSubject = new Subject<undefined>();
+  const searchQuerySubject = new Subject<SubtitleSearchForSeriesQueryVariables>();
+  const loading = ref(true);
+  const tmdb_id = ref('');
+  const language = ref(useLanguageStore().preferredContentLanguage);
+  const seasons = ref<Omit<Seasons, 'id' | 'type'>[]>([]);
+  const season = ref(1);
+  const episode = ref(0);
+
+  const filter = ref('');
+  const onlyHearingImpaired = ref(false);
+  const entries = ref<Omit<SubtitleSearchResultData, 'id' | 'type'>[]>([]);
+
+  const searchQueryObservable = searchQuerySubject.pipe(
+    tap(() => (loading.value = true)),
+    switchMap((variables: SubtitleSearchForSeriesQueryVariables) => from(searchQuery(variables))),
+    tap((result: SubtitleSearchForSeriesQuery) => {
+      loading.value = false;
+      entries.value = result.subtitleSearch.data;
+      seasons.value = result.seasons.seasons;
+    })
+  );
+  const allObservables = merge(
+    unmountSubject,
+    searchQueryObservable,
+    searchQuerySubject
+  ).pipe(takeUntil(unmountSubject));
+
+  return {
+    loading,
+    tmdb_id,
+    language,
+    filter,
+    onlyHearingImpaired,
+    entries,
+    seasons,
+    season,
+    episode,
     initialize() {
-      const searchQueryObservable = this.searchQuerySubject.pipe(
-        tap(() => (this.loading = true)),
-        switchMap((variables: SubtitleSearchForSeriesQueryVariables) => from(searchQuery(variables))),
-        tap((result: SubtitleSearchForSeriesQuery) => {
-          this.loading = false;
-          this.entries = result.subtitleSearch.data;
-          this.seasons = result.seasons.seasons;
-        })
-      );
-      merge(
-        this.unmountSubject,
-        searchQueryObservable,
-        this.searchQuerySubject
-      ).pipe(takeUntil(this.unmountSubject)).subscribe();
+      allObservables.subscribe();
     },
     unmount() {
-      this.unmountSubject.next(undefined);
+      unmountSubject.next(undefined);
     },
     triggerQuery() {
-      this.searchQuerySubject.next({
-        language: this.language.language_code,
-        tmdb_id: this.tmdb_id,
-        season_number: this.season,
-        episode_number: this.episode
+      searchQuerySubject.next({
+        language: language.value.language_code,
+        tmdb_id: tmdb_id.value,
+        season_number: season.value,
+        episode_number: episode.value
       });
     },
     async select(openSubtitle: SubtitleSearchResultData, whileDownloadingFn: () => unknown) {
@@ -90,24 +100,20 @@ export const useStore = defineStore('subtitleSearchForSeriesStore', {
         appStore.$patch({ state: 'ERROR' });
       }
       await trackStore.track({ source: 'search-for-movie', language: this.language.language_code });
-    }
-  },
-  getters: {
-    contentLanguages: () => useLanguageStore().contentLanguages,
-    filteredEntries() {
-      return this.entries.filter(({ attributes }) => {
-        if (this.filter === '') {
-          return this.onlyHearingImpaired ? attributes.hearing_impaired : true;
+    },
+
+    contentLanguages: computed(() => useLanguageStore().contentLanguages),
+    filteredEntries: computed(() => {
+      return entries.value.filter(({ attributes }) => {
+        if (filter.value === '') {
+          return onlyHearingImpaired.value ? attributes.hearing_impaired : true;
         }
-        const intermediate = attributes.files[0].file_name?.toLowerCase().includes(this.filter.toLowerCase()) ?? false;
-        return this.onlyHearingImpaired ? intermediate && attributes.hearing_impaired : intermediate;
+        const intermediate = attributes.files[0].file_name?.toLowerCase().includes(filter.value.toLowerCase()) ?? false;
+        return onlyHearingImpaired.value ? intermediate && attributes.hearing_impaired : intermediate;
       });
-    },
-    seasonCount() {
-      return this.seasons?.length ?? 0;
-    },
-    episodeCount() {
-      return this.seasons?.find((s) => s.season_number === this.season)?.episode_count ?? 0;
-    }
-  }
+    }),
+    seasonCount: computed(() => seasons.value.length),
+    episodeCount: computed(() => seasons.value.find((s) => s.season_number === season.value)?.episode_count ?? 0)
+  };
+
 });

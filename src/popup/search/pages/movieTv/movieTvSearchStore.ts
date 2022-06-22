@@ -8,49 +8,53 @@ import { useStore as useSearchStore } from '@/search/store';
 import { asyncScheduler, from, merge, Subject } from 'rxjs';
 import { map, switchMap, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { searchQuery, VideoSearchQuery, VideoSearchResultEntry } from '@/search/pages/movieTv/searchQuery';
+import { computed, ref } from 'vue';
 
-export const useStore = defineStore('movieTvSearchStore', {
-  state: () => {
-    return {
-      unmountSubject: new Subject<undefined>(),
-      searchQuerySubject: new Subject<string>(),
-      query: "",
-      loading: true,
-      entries: [] as VideoSearchResultEntry[],
-      selected: {
-        tmdb_id: "",
-        media_type: ""
-      }
-    };
-  },
-  actions: {
+export const useStore = defineStore('movieTvSearchStore', () => {
+  const unmountSubject = new Subject<undefined>();
+  const searchQuerySubject = new Subject<string>();
+  const query = ref('');
+  const loading = ref(true);
+  const entries = ref<VideoSearchResultEntry[]>([]);
+  const selected = ref({
+    tmdb_id: '',
+    media_type: ''
+  });
+
+  const searchQueryObservable = searchQuerySubject.pipe(
+    map((q: string) => q.trim()),
+    tap(() => (loading.value = true)),
+    throttleTime(750, asyncScheduler, { trailing: true, leading: true }),
+    switchMap((query: string) =>
+      query !== ''
+        ? from(searchQuery({ query }))
+        : from(Promise.resolve({ videoSearch: { entries: [] }, query: '' }))
+    ),
+    tap((result: VideoSearchQuery & { query: string }) => {
+      loading.value = false;
+      entries.value = result.videoSearch.entries;
+    })
+  );
+
+  const allObservables = merge(
+    unmountSubject,
+    searchQueryObservable,
+    searchQuerySubject
+  ).pipe(takeUntil(unmountSubject));
+
+  return {
+    query,
+    loading,
+    entries,
+    selected,
     initialize() {
-      const searchQueryObservable = this.searchQuerySubject.pipe(
-        map((q: string) => q.trim()),
-        tap(() => (this.loading = true)),
-        throttleTime(750, asyncScheduler, { trailing: true, leading: true }),
-        switchMap((query: string) =>
-          query !== ''
-            ? from(searchQuery({ query }))
-            : from(Promise.resolve({ videoSearch: { entries: [] }, query: '' }))
-        ),
-        tap((result: VideoSearchQuery & { query: string }) => {
-          this.loading = false;
-          this.entries = result.videoSearch.entries;
-        })
-      );
-
-      merge(
-        this.unmountSubject,
-        searchQueryObservable,
-        this.searchQuerySubject
-      ).pipe(takeUntil(this.unmountSubject)).subscribe();
+      allObservables.subscribe();
     },
     unmount() {
-      this.unmountSubject.next(undefined);
+      unmountSubject.next(undefined);
     },
     triggerQuery() {
-      this.searchQuerySubject.next(this.query);
+      searchQuerySubject.next(query.value);
     },
     selectEntry(entry: VideoSearchResultEntry) {
       const searchStore = useSearchStore();
@@ -63,10 +67,10 @@ export const useStore = defineStore('movieTvSearchStore', {
         vote_average: entry.vote_average ?? 0
       });
 
-      this.selected = {
+      selected.value = {
         media_type: entry.media_type,
         tmdb_id: entry.tmdb_id
-      }
+      };
     },
     highlightCurrentVideo() {
       useVideoStore().highlightCurrent();
@@ -85,9 +89,9 @@ export const useStore = defineStore('movieTvSearchStore', {
       const trackStore = useTrackStore();
 
       const resetAll = async () => {
-        appStore.$reset();
-        fileStore.$reset();
-        subtitleStore.$reset();
+        appStore.reset();
+        fileStore.reset();
+        subtitleStore.reset();
         await videoStore.removeCurrent();
       };
 
@@ -108,23 +112,19 @@ export const useStore = defineStore('movieTvSearchStore', {
       }
 
       await trackStore.track({ source: 'file', language: '' });
-    }
-  },
-  getters: {
-    existsMultipleVideos: () => useVideoStore().count > 1,
-    onlySingleVideo: () => useVideoStore().count === 1,
-    existsVideoName: () => useVideoStore().videoName !== '',
-    videoName: () => useVideoStore().videoName,
-    selectedNavigateTo(){
-      return this.selected.media_type === 'movie' ? "SUBTITLE-SEARCH-FOR-MOVIES" as const : "SUBTITLE-SEARCH-FOR-SERIES" as const;
     },
-    selectedNavigatePayload(){
+    existsMultipleVideos: computed(() => useVideoStore().count > 1),
+    onlySingleVideo: computed(() => useVideoStore().count === 1),
+    existsVideoName: computed(() => useVideoStore().videoName !== ''),
+    videoName: computed(() => useVideoStore().videoName),
+    selectedNavigateTo: computed(() => selected.value.media_type === 'movie' ? 'SUBTITLE-SEARCH-FOR-MOVIES' as const : 'SUBTITLE-SEARCH-FOR-SERIES' as const),
+    selectedNavigatePayload: computed(() => {
       return {
-        tmdb_id: this.selected.tmdb_id,
-        media_type: this.selected.media_type,
-        searchQuery: this.query,
+        tmdb_id: selected.value.tmdb_id,
+        media_type: selected.value.media_type,
+        searchQuery: query.value,
         contentTransitionName: 'content-navigate-deeper' as const
-      }
-    }
-  }
+      };
+    })
+  };
 });

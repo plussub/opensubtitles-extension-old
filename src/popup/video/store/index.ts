@@ -1,4 +1,4 @@
-import { computed, ComputedRef, onUnmounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { SubtitleEntry } from '@/subtitle/store';
 import { mergeMap, takeUntil, tap } from 'rxjs/operators';
 import { merge, Subject, interval } from 'rxjs';
@@ -12,70 +12,72 @@ export interface Video {
   hasSubtitle: boolean;
   origin: string;
   lastTimestamp: string;
-  status: "none" | "selected" | "injected"
+  status: 'none' | 'selected' | 'injected';
 }
 
-export interface VideoStore {
-  actions: {
-    setCurrent: (payload: { video: Pick<Video, 'id'> }) => Promise<unknown>;
-    removeCurrent: () => Promise<unknown>;
-    addVtt: (payload: { subtitles: SubtitleEntry[]; subtitleId: string; language: string }) => void;
-    setTime: (payload: { time: number }) => void;
-    highlight: (payload: { video: Pick<Video, 'id'> | null }) => void;
-    removeHighlight: () => void;
-  };
-  getters: {
-    current: ComputedRef<Video | null>;
-    list: ComputedRef<Video[]>;
-    count: ComputedRef<number>;
-    videoName: ComputedRef<string>;
-  };
-}
 const tick = async () => new Promise(resolve => setTimeout(() => resolve(undefined)));
 
-export const useStore = defineStore('video', {
-  state: () => {
-    return {
-      videos: {} as Record<string, Video>,
-      unmountSubject: new Subject<undefined>(),
-      initialized: false
+export const useStore = defineStore('video', () => {
+  const unmountSubject = new Subject<undefined>();
+
+  const videos = ref<Record<string, Video>>({});
+
+  const videoUpdateIntervalObservable = interval(300).pipe(
+    mergeMap(() =>
+      useContentScriptStore().sendCommandWithResponse(
+        { contentScriptInput: 'FIND_VIDEOS_REQUEST' },
+        (responses) => responses.reduce((acc, cur) => ({ ...acc, ...cur.data.videos }), {})
+      )
+    ),
+    tap(newVideos => videos.value = newVideos)
+  );
+
+  const allObservables = merge(
+    unmountSubject,
+    videoUpdateIntervalObservable
+  ).pipe(takeUntil(unmountSubject));
+
+  const initialized = ref(false);
+  const current = computed(() => Object.values<Video>(videos.value).find((v) => v.status === 'selected' || v.status === 'injected') ?? null);
+  const currentTime = computed(() => parseInt(current.value?.lastTimestamp ?? '0', 10));
+
+  const highlight = ({ video }: { video: Pick<Video, 'id'> | null }) => {
+    if (!video) {
+      console.warn('highlight: video not found');
+      return;
     }
-  },
-  actions: {
+    useContentScriptStore().sendCommand({
+      contentScriptInput: 'HIGHLIGHT_VIDEO',
+      id: video.id
+    });
+  };
+  return {
+    videos,
+    initialized,
     async initialize() {
-      const videoUpdateIntervalObservable = interval(300).pipe(
-        mergeMap(() =>
-          useContentScriptStore().sendCommandWithResponse(
-            { contentScriptInput: 'FIND_VIDEOS_REQUEST' },
-            (responses) => responses.reduce((acc, cur) => ({ ...acc, ...cur.data.videos }), {})
-          )
-        ),
-        tap(videos => this.setVideos(videos)),
-      );
-
-      merge(
-        this.unmountSubject,
-        videoUpdateIntervalObservable
-      ).pipe(takeUntil(this.unmountSubject)).subscribe()
-
-      this.initialized = true;
+      allObservables.subscribe();
+      initialized.value = true;
     },
     unmount() {
-      this.unmountSubject.next(undefined);
+      unmountSubject.next(undefined);
     },
-    setVideos(videos: Record<string, Video>){
-      this.videos = videos;
+    setVideos(newVideos: Record<string, Video>) {
+      videos.value = newVideos;
     },
-    async setCurrent ({ video: { id } }: { video: Pick<Video, 'id'> }) {
+    async setCurrent({ video: { id } }: { video: Pick<Video, 'id'> }) {
       useContentScriptStore().sendCommand({ contentScriptInput: 'SELECT_VIDEO', id });
       return tick();
     },
-    async removeCurrent () {
+    async removeCurrent() {
       useContentScriptStore().sendCommand({ contentScriptInput: 'DESELECT_VIDEO' });
       return tick();
     },
-    async addVtt ({ subtitles, subtitleId, language }: { subtitles: SubtitleEntry[]; subtitleId: string; language: string }) {
-      const video = Object.values<Video>(this.videos).find((v) => v.status === 'selected' || v.status === 'injected');
+    async addVtt({
+                   subtitles,
+                   subtitleId,
+                   language
+                 }: { subtitles: SubtitleEntry[]; subtitleId: string; language: string }) {
+      const video = Object.values<Video>(videos.value).find((v) => v.status === 'selected' || v.status === 'injected');
       if (!video) {
         return tick();
       }
@@ -95,8 +97,8 @@ export const useStore = defineStore('video', {
       });
       return tick();
     },
-    setTime ({ time }: { time: number }) {
-      const video = Object.values<Video>(this.videos).find((v) => v.status === 'selected' || v.status === 'injected');
+    setTime({ time }: { time: number }) {
+      const video = Object.values<Video>(videos.value).find((v) => v.status === 'selected' || v.status === 'injected');
       if (!video) {
         console.warn('setTime: current video not found');
         return;
@@ -107,39 +109,19 @@ export const useStore = defineStore('video', {
         time
       });
     },
-    highlight({ video }: { video: Pick<Video, 'id'> | null }): void {
-      if (!video) {
-        console.warn('highlight: video not found');
-        return;
-      }
-      useContentScriptStore().sendCommand({
-        contentScriptInput: 'HIGHLIGHT_VIDEO',
-        id: video.id
-      });
-    },
+    highlight,
     highlightCurrent() {
-      this.highlight({video: this.current})
+      highlight({ video: current.value });
     },
-    removeHighlight (){
-      useContentScriptStore().sendCommand({ contentScriptInput: 'REMOVE_HIGHLIGHT_FROM_VIDEO' })
-    }
-  },
-  getters: {
-    current() {
-      return Object.values<Video>(this.videos).find((v) => v.status === 'selected' || v.status === 'injected') ?? null
+    removeHighlight() {
+      useContentScriptStore().sendCommand({ contentScriptInput: 'REMOVE_HIGHLIGHT_FROM_VIDEO' });
     },
-    currentTime() {
-      return parseInt(this.current ?.lastTimestamp ?? '0', 10)
-    },
-    currentTimeAs() {
-      return (fmt: string) => Duration.fromMillis(this.currentTime).toFormat(fmt)
-    },
-    list() {
-      return Object.values<Video>(this.videos).sort((a, b) => a.id.localeCompare(b.id));
-    },
-    count: (state) => Object.keys(state.videos).length,
-    //todo move to own store
-    videoName:  () => {
+    current,
+    currentTime,
+    currentTimeAs: (fmt: string) => computed(() => Duration.fromMillis(currentTime.value).toFormat(fmt)),
+    list: computed(() => Object.values<Video>(videos.value).sort((a, b) => a.id.localeCompare(b.id))),
+    count: computed(() => Object.keys(videos.value).length),
+    videoName: computed(() => {
       const REGEX_JAPANESE = /[\u3000-\u303f]|[\u3040-\u309f]|[\u30a0-\u30ff]|[\uff00-\uff9f]|[\u4e00-\u9faf]|[\u3400-\u4dbf]/;
       const REGEX_CHINESE = /[\u4e00-\u9fff]|[\u3400-\u4dbf]|[\u{20000}-\u{2a6df}]|[\u{2a700}-\u{2b73f}]|[\u{2b740}-\u{2b81f}]|[\u{2b820}-\u{2ceaf}]|[\uf900-\ufaff]|[\u3300-\u33ff]|[\ufe30-\ufe4f]|[\uf900-\ufaff]|[\u{2f800}-\u{2fa1f}]/u;
       const REGEX_SPECIAL_CHAR = /^(.*?)[ (（[0-9_ ：第-]/;
@@ -158,6 +140,6 @@ export const useStore = defineStore('video', {
           }
           return document.title;
       }
-    }
-  }
-})
+    })
+  };
+});
