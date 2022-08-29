@@ -1,4 +1,4 @@
-import { combineLatest, debounceTime, fromEvent, merge, Observable, Subject } from 'rxjs';
+import { combineLatest, debounceTime, fromEvent, merge, Observable, Subject, withLatestFrom } from 'rxjs';
 import { filter, map, scan, share, take, takeUntil, tap, bufferCount } from 'rxjs/operators';
 import { ref } from 'vue';
 import { nanoid } from 'nanoid';
@@ -76,9 +76,9 @@ export const useStore = defineStore('contentScript', () => {
     }))
   );
   const sendAllSubject = new Subject<{ payload: Record<string, unknown> }>();
-  const sendAllObservable = combineLatest([sendAllSubject, connectionObservable]).pipe(
-    debounceTime(0),
-    tap(([{ payload }, connections]) =>
+  const sendAllObservable = sendAllSubject.pipe(
+    withLatestFrom(connectionObservable),
+    tap(([{ payload }, connections]) => {
       Object.values(connections).forEach(({ source }) =>
         source.postMessage(
           {
@@ -88,8 +88,8 @@ export const useStore = defineStore('contentScript', () => {
           },
           '*'
         )
-      )
-    )
+      );
+    })
   );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const sendWithResponseSubject = new Subject<{ payload: Record<string, unknown>, mergeFn: (x: any[]) => any, responseSubject: Subject<any> }>();
