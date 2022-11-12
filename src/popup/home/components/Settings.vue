@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class='flex justify-around relative mt-1'>
+  <div class='w-full'>
+    <div class='flex justify-around relative pt-1 bg-primary-50 shadow-md'>
       <slot
         name='time-settings-tab-header'
         :selected="selectedArea === 'time-settings'"
@@ -27,7 +27,10 @@
       <Divider class='absolute w-full bottom-0 border-surface-200'></Divider>
     </div>
 
-    <div class='mx-9 mt-8'>
+
+    <div
+      class='px-4 py-4'
+      :class='{"bg-surface-50": (selectedArea === "appearance-settings") , "bg-surface-100": (selectedArea === "time-settings" || selectedArea === "transcript" || selectedArea === "info")}' style='min-height: 280px;'>
       <slot v-if="selectedArea === 'time-settings'" name='time-settings-tab'></slot>
       <slot v-if="selectedArea === 'appearance-settings'" name='appearance-settings-tab'></slot>
       <slot v-if="selectedArea === 'transcript'" name='transcript-tab'></slot>

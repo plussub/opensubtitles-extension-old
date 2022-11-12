@@ -5,6 +5,7 @@ video[data-uitjeuin-status="injected"]::cue,
     font-size: calc(var(--uitjeuin-cue-font-size)*1px);
     font-weight: var(--uitjeuin-cue-font-weight);
     line-height: var(--uitjeuin-cue-line-height);
+    text-shadow: var(--uitjeuin-cue-text-shadow);
 
     outline: var(--uitjeuin-cue-background-color) solid 500px;
     background-image: linear-gradient(var(--uitjeuin-cue-background-color), var(--uitjeuin-cue-background-color));

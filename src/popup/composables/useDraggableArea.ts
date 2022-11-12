@@ -1,8 +1,12 @@
 import { onUnmounted, onMounted, Ref } from 'vue';
-import { EXTENSION_ORIGIN } from '@/types';
+import {
+  getExtensionPopUpDiv, moveExtensionPopUpWindow,
+  toDefaultExtensionPopUpBoxShadow,
+  toMovingExtensionPopUpBoxShadow
+} from '@/extensionPopUpShadowDiv';
 
 const getShadowDiv = (): HTMLElement => {
-  const shadowDiv = document.getElementById(`${EXTENSION_ORIGIN}Shadow`);
+  const shadowDiv = getExtensionPopUpDiv();
   if (!shadowDiv) {
     throw new Error('ShadowDiv not found');
   }
@@ -25,6 +29,16 @@ export const useDraggableArea = ({ draggableAreaRef }: Payload): void => {
     }
   };
   const appShadowDiv = getShadowDiv();
+  const dragOverlayDiv = document.createElement('div');
+  Object.assign(dragOverlayDiv.style, {
+    position: "absolute",
+    zIndex: "10000",
+    height: "100%",
+    width: "100%",
+    top: "0px",
+    "background-color": "rgba(35,35,35,0.50)"
+  });
+
 
   const closeDragElement = () => {
     document.removeEventListener('touchstart', closeDragElement);
@@ -32,6 +46,10 @@ export const useDraggableArea = ({ draggableAreaRef }: Payload): void => {
 
     document.removeEventListener('mouseUp', closeDragElement);
     document.removeEventListener('mousemove', elementDragMouse);
+    if(appShadowDiv.shadowRoot?.querySelector(".content-pane")?.contains(dragOverlayDiv)){
+      appShadowDiv.shadowRoot?.querySelector(".content-pane")?.removeChild(dragOverlayDiv);
+    }
+    toDefaultExtensionPopUpBoxShadow();
   };
   const elementDragMouse = (e: MouseEvent) => {
     e.preventDefault();
@@ -54,8 +72,12 @@ export const useDraggableArea = ({ draggableAreaRef }: Payload): void => {
         last: clientY
       }
     };
-    appShadowDiv.style.top = `${appShadowDiv.offsetTop - position.y.current}px`;
-    appShadowDiv.style.left = `${appShadowDiv.offsetLeft - position.x.current}px`;
+    appShadowDiv.shadowRoot?.querySelector(".content-pane")?.appendChild(dragOverlayDiv);
+    toMovingExtensionPopUpBoxShadow();
+    moveExtensionPopUpWindow({
+      top: `${appShadowDiv.offsetTop - position.y.current}px`,
+      left: `${appShadowDiv.offsetLeft - position.x.current}px`
+    });
   };
 
   const dragTouch = (e: TouchEvent) => {
@@ -68,6 +90,7 @@ export const useDraggableArea = ({ draggableAreaRef }: Payload): void => {
   const dragMouse = (e: MouseEvent) => {
     position.x.last = e.clientX;
     position.y.last = e.clientY;
+
     document.addEventListener('mouseup', closeDragElement);
     document.addEventListener('mousemove', elementDragMouse);
   };
