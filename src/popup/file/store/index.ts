@@ -16,6 +16,8 @@ export const useStore = defineStore('file', () => {
             return '.ass';
           case /\.(ssa)$/.test(filename):
             return '.ssa';
+          case /\.(webvtt)$/.test(filename):
+            return '.vtt';
           case /\.(vtt)$/.test(filename):
             return '.vtt';
           case /\.(srt)$/.test(filename):
