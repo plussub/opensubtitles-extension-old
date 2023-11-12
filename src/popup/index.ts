@@ -16,7 +16,7 @@ export const init = async (): Promise<void> => {
     toExtensionPopUpInitTop();
     toDefaultExtensionPopUpBoxShadow();
   } else {
-    const app = createApp(appComponent, {unmount: () => app.unmount()});
+    const app = createApp(appComponent, { unmount: () => app.unmount() });
     const pinia = createPinia()
     pinia.use(piniaPluginPersistedstate)
     app.use(pinia);
@@ -27,7 +27,7 @@ export const init = async (): Promise<void> => {
     appShadowDiv.id = getExtensionPopUpId();
     Object.assign(appShadowDiv.style, {
       position: "absolute",
-      zIndex: "10000",
+      zIndex: "10002",
       top: extensionPopUpTopAsCssVar(),
       left: extensionPopUpLeftAsCssVar(),
       right: "16px",
